@@ -11,7 +11,8 @@
     <head>
         @* Here's where we render the page title `String`. *@
         <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/postal.css")">
         <link rel="shortcut icon" href="//cdn.quatrolabs.com/favicon.ico">
     </head>
     <body>
@@ -19,6 +20,7 @@
          * the page content. *@
         @content
 
-        <script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+        <script src="@routes.Assets.versioned("javascripts/postal.js")"></script>
     </body>
 </html>
