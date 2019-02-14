@@ -12,8 +12,9 @@ The application is using Play + Java on the back-end and Vue + TypeScript on the
 
 ## Setup & Running
 
-Please make sure to install Java 8, Gradle and SBT. Once that is done, you may run `sbt run`
-to start the development server.
+Please make sure to install Java 8, Gradle and SBT. Also, you must create a `conf/secrets.conf`
+file according to the template configuration in `conf/secrets.sample.conf`. Once that is done,
+you may run `sbt run` to start the development server.
 
 ## Issues
 

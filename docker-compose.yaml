@@ -1,0 +1,13 @@
+version: '3.4'
+services:
+  postal-mongo:
+    image: 'mongo:3.6.10'
+    container_name: postal-mongo
+    hostname: postal-mongo
+    ports:
+        - "27017:27017"
+    volumes:
+      - postal-mongo-data:/data/db
+
+volumes:
+  postal-mongo-data:

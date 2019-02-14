@@ -1,7 +1,6 @@
 package controllers;
 
 import play.mvc.*;
-import services.MailerService;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -18,4 +17,10 @@ public class HomeController extends Controller {
     public Result index() {
         return ok(views.html.index.render());
     }
+
+
+    public Result email(String _id) {
+        return this.index();
+    }
+
 }
