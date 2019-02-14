@@ -2,8 +2,6 @@ package models;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Date;
 import javax.mail.Address;
 import org.bson.Document;
@@ -37,34 +35,76 @@ public class Email {
         public final String fromPersonal;
         public final String bodyPlain;
         public final String bodyHTML;
+        public final Metadata metadata;
 
-        public Summary(final String publicId,
-                       final Date sentAt,
-                       final String subject,
-                       final String from,
-                       final String fromPersonal,
-                       final String bodyPlain,
-                       final String bodyHTML) {
-            this.publicId = publicId;
-            this.sentAt = sentAt;
-            this.subject = subject;
-            this.from = from;
-            this.fromPersonal = fromPersonal;
-            this.bodyPlain = bodyPlain;
-            this.bodyHTML = bodyHTML;
+        public Summary(Email source) {
+            this.publicId = source.publicId;
+            this.sentAt = source.sentAt;
+            this.subject = source.subject;
+            this.from = source.from;
+            this.fromPersonal = source.fromPersonal;
+            this.bodyPlain = source.bodyPlain;
+            this.bodyHTML = source.bodyHTML;
+            this.metadata = source.metadata;
         }
 
         public Summary(Document doc) {
-            Email email = new Email(doc);
-
-            this.publicId = email.publicId;
-            this.sentAt = email.sentAt;
-            this.subject = email.subject;
-            this.from = email.from;
-            this.fromPersonal = email.fromPersonal;
-            this.bodyPlain = email.bodyPlain;
-            this.bodyHTML = email.bodyHTML;
+            this(new Email(doc));
         }
+    }
+
+    public static class Presentation {
+        public final String publicId;
+        public final Date sentAt;
+        public final String subject;
+        public final String from;
+        public final String fromPersonal;
+        public final List<String> to;
+        public final List<String> bcc;
+        public final List<String> cc;
+        public final String replyTo;
+        public final String bodyPlain;
+        public final String bodyHTML;
+        public final Metadata metadata;
+
+        public Presentation(Email source) {
+            this.publicId = source.publicId;
+            this.sentAt = source.sentAt;
+            this.subject = source.subject;
+            this.from = source.from;
+            this.fromPersonal = source.fromPersonal;
+            this.to = source.to;
+            this.bcc = source.bcc;
+            this.cc = source.cc;
+            this.replyTo = source.replyTo;
+            this.bodyPlain = source.bodyPlain;
+            this.bodyHTML = source.bodyHTML;
+            this.metadata = source.metadata;
+        }
+
+        public Presentation(Document doc) {
+            this(new Email(doc));
+        }
+    }
+
+    public static class Metadata {
+
+        public final static String METADATA_READ = "read";
+
+        public final boolean read;
+
+        public Metadata() {
+            this.read = false;
+        }
+
+        public Metadata(Document doc) {
+            this.read = doc.get(METADATA_READ, Boolean.class).booleanValue();
+        }
+
+        public Document toDocument() {
+            return new Document(METADATA_READ, this.read);
+        }
+
     }
 
     public final String publicId;
@@ -80,7 +120,7 @@ public class Email {
     public final String replyTo;
     public final String bodyPlain;
     public final String bodyHTML;
-    public final Map<String, Object> metadata;
+    public final Metadata metadata;
 
     public Email(final String bucketKey,
                  final String bucketObject,
@@ -108,8 +148,7 @@ public class Email {
         this.bodyHTML = bodyHTML;
 
         this.publicId = RandomStringGenerator.generate(32);
-        this.metadata = new HashMap<String, Object>();
-        this.metadata.put("read", Boolean.FALSE);
+        this.metadata = new Metadata();
     }
 
     public Email(Document doc) {
@@ -126,7 +165,7 @@ public class Email {
         this.replyTo = doc.get(Attributes.REPLY_TO, String.class);
         this.bodyPlain = doc.get(Attributes.BODY_PLAIN, String.class);
         this.bodyHTML = doc.get(Attributes.BODY_HTML, String.class);
-        this.metadata = (Document) doc.get(Attributes.METADATA);
+        this.metadata = new Metadata((Document) doc.get(Attributes.METADATA));
     }
 
     public Document toDocument() {
@@ -147,13 +186,11 @@ public class Email {
     }
 
     public Summary toSummary() {
-        return new Summary(this.publicId,
-            this.sentAt,
-            this.subject,
-            this.from,
-            this.fromPersonal,
-            this.bodyPlain,
-            this.bodyHTML);
+        return new Summary(this);
+    }
+
+    public Presentation toPresentation() {
+        return new Presentation(this);
     }
 
     public static List<String> parseAddressList(List<Address> addresses) {
