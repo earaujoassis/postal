@@ -7,27 +7,25 @@ export interface EmailCommons {
     subject: string;
     from: string;
     fromPersonal: string;
-    bodyPlain: string;
-    bodyHTML: string;
     metadata: any;
 
     origin(): string;
-    abstract(): string;
+    excerpt(): string;
     relativeTime(): string;
     isRead(): boolean;
     isActive(currentEmail: any): boolean;
 }
 
 export class EmailSummary implements EmailCommons {
-    static readonly ABSTRACT_CHAR_LIMIT = 64;
+    static readonly EXCERPT_CHAR_LIMIT = 64;
+
+    private _excerpt: string;
 
     publicId: string;
     sentAt: number;
     subject: string;
     from: string;
     fromPersonal: string;
-    bodyPlain: string;
-    bodyHTML: string;
     metadata: any;
 
     constructor(source: any) {
@@ -36,9 +34,9 @@ export class EmailSummary implements EmailCommons {
         this.subject = source.subject;
         this.from = source.from;
         this.fromPersonal = source.fromPersonal;
-        this.bodyPlain = source.bodyPlain;
-        this.bodyHTML = source.bodyHTML;
         this.metadata = source.metadata;
+
+        this._excerpt = source.excerpt;
     }
 
     origin(): string {
@@ -51,20 +49,8 @@ export class EmailSummary implements EmailCommons {
         }
     }
 
-    abstract(): string {
-        let abstract: string;
-
-        if (this.bodyPlain) {
-            abstract = this.bodyPlain.trim().slice(0, EmailSummary.ABSTRACT_CHAR_LIMIT);
-            abstract = this.bodyPlain.length > EmailSummary.ABSTRACT_CHAR_LIMIT ? abstract.trim() + "..." : abstract;
-        } else if (this.bodyHTML) {
-            let text: string = (new DOMParser).parseFromString(this.bodyHTML, "text/html").documentElement.textContent;
-            abstract = text.trim().slice(0, EmailSummary.ABSTRACT_CHAR_LIMIT).trim() + "...";
-        } else {
-            abstract = "Excerpt not available";
-        }
-
-        return abstract;
+    excerpt(): string {
+        return this._excerpt;
     }
 
     relativeTime(): string {
@@ -83,9 +69,13 @@ export class EmailSummary implements EmailCommons {
 export class EmailFull extends EmailSummary {
     to: Array<string>;
     replyTo: string;
+    bodyPlain: string;
+    bodyHTML: string;
 
     constructor(source: any) {
         super(source);
+        this.bodyPlain = source.bodyPlain;
+        this.bodyHTML = source.bodyHTML;
         this.to = source.to;
         this.replyTo = source.replyTo;
         this.metadata = source.metadata;

@@ -33,7 +33,7 @@
               <span class="entry-datetime">{{ entry.relativeTime() }}</span>
             </div>
             <h2 class="entry-subject">{{ entry.subject }}</h2>
-            <p class="entry-abstract">{{ entry.abstract() }}</p></div>
+            <p class="entry-excerpt">{{ entry.excerpt() }}</p></div>
         </li>
       </ul>
     </div>
@@ -62,7 +62,7 @@
             <div class="body-header">
               <span class="user-avatar"></span>
               <div class="body-meta-box">
-                <p><span class="user-name">Carlos Assis</span> to wired@@newsletters.wired.com</p>
+                <p><span class="user-name">Carlos Assis</span> to wired@newsletters.wired.com</p>
               </div>
             </div>
             <div class="body-corpus">

@@ -3,8 +3,10 @@ package models;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Pattern;
 import javax.mail.Address;
 import org.bson.Document;
+import org.jsoup.Jsoup;
 
 import utils.RandomStringGenerator;
 
@@ -33,9 +35,10 @@ public class Email {
         public final String subject;
         public final String from;
         public final String fromPersonal;
-        public final String bodyPlain;
-        public final String bodyHTML;
         public final Metadata metadata;
+
+        private final String bodyPlain;
+        private final String bodyHTML;
 
         public Summary(Email source) {
             this.publicId = source.publicId;
@@ -50,6 +53,22 @@ public class Email {
 
         public Summary(Document doc) {
             this(new Email(doc));
+        }
+
+        public String getExcerpt() {
+            Pattern urlPattern = Pattern.compile("((https?|ftp|http):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)", Pattern.CASE_INSENSITIVE);
+            Pattern garbagePattern = Pattern.compile("([-_=]{2,})", Pattern.CASE_INSENSITIVE);
+            String excerpt;
+
+            if (this.bodyHTML != null) {
+                excerpt = Jsoup.parse(this.bodyHTML).text();
+                return garbagePattern.matcher(excerpt).replaceAll("");
+            } else if (this.bodyPlain != null) {
+                excerpt = this.bodyPlain;
+                return garbagePattern.matcher(urlPattern.matcher(excerpt).replaceAll("")).replaceAll("");
+            }
+
+            return "not available";
         }
     }
 

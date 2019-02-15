@@ -17,6 +17,7 @@ libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk16" % "1.46"
 libraryDependencies += "org.bouncycastle" % "bcprov-jdk15on" % "1.61"
 libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.61"
 libraryDependencies += "org.apache.logging.log4j" % "log4j" % "2.11.2"
+libraryDependencies += "org.jsoup" % "jsoup" % "1.11.3"
 
 includeFilter in (Assets, LessKeys.less) := "*.less"
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
