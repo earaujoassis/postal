@@ -22,9 +22,9 @@
       <ul class="entries" role="tablist">
         <li v-for="entry in state.emails">
           <div
+            @click="fetchEmail(entry.publicId)"
             v-bind:id="entry.publicId"
             v-bind:class="{ 'entry-box': true, read: entry.isRead(), active: entry.isActive(state.currentEmail) }"
-            v-on:click="fetchEmailData(entry.publicId)"
             aria-selected="false"
             aria-controls="body-corpus-id"
             role="tab">
@@ -92,11 +92,21 @@
   @Component
   export default class App extends Vue {
       @State("emails") state!: EmailsState;
-      @Action("fetchData", { namespace }) fetchData: any;
+      @Action("fetchEmailsData", { namespace }) fetchEmailsData: any;
       @Action("fetchEmailData", { namespace }) fetchEmailData: any;
+      @Action("markEmailsAsRead", { namespace }) markEmailsAsRead: any;
 
       mounted() {
-        this.fetchData();
+        this.fetchEmailsData();
+      }
+
+      fetchEmail(publicId: string) {
+        this.fetchEmailData(publicId);
+
+        let emailMetadata: any = this.state.emails.filter(email => email.publicId === publicId)[0].metadata;
+        if (emailMetadata.read === false) {
+          this.markEmailsAsRead(publicId);
+        }
       }
 
       fixIFrameHeight() {
