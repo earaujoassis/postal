@@ -3,8 +3,8 @@
 # ~~~~
 
 GET     /                           controllers.HomeController.index
-GET     /email/:id                  controllers.HomeController.email(id: String)
-GET     /api/emails                 controllers.ApiEmailController.list
+
+GET     /api/emails                 controllers.ApiEmailController.list(folder: String ?=null)
 GET     /api/emails/:id             controllers.ApiEmailController.show(id: String)
 PATCH   /api/emails/:id             controllers.ApiEmailController.update(id: String)
 

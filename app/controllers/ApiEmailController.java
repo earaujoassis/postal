@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.ArrayList;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import services.DocumentStoreService;
 import models.Email;
@@ -29,20 +30,32 @@ public class ApiEmailController extends Controller {
         this.documentStore = documentStore;
     }
 
-    public Result list() {
-        Iterable<Document> docs = this.documentStore
-            .getCollection(DocumentStoreService.Collections.EMAILS)
-            .find()
-            .projection(fields(include(Email.Attributes.PUBLIC_ID,
-                Email.Attributes.SENT_AT,
-                Email.Attributes.SUBJECT,
-                Email.Attributes.FROM,
-                Email.Attributes.FROM_PERSONAL,
-                Email.Attributes.BODY_PLAIN,
-                Email.Attributes.BODY_HTML,
-                Email.Attributes.METADATA), excludeId()))
-            .sort(orderBy(descending(Email.Attributes.SENT_AT)));
+    public Result list(String folder) {
+        Bson projection = fields(include(Email.Attributes.PUBLIC_ID,
+            Email.Attributes.SENT_AT,
+            Email.Attributes.SUBJECT,
+            Email.Attributes.FROM,
+            Email.Attributes.FROM_PERSONAL,
+            Email.Attributes.BODY_PLAIN,
+            Email.Attributes.BODY_HTML,
+            Email.Attributes.METADATA), excludeId());
+        Bson sorting = orderBy(descending(Email.Attributes.SENT_AT));
         List<Email.Summary> emails = new ArrayList<Email.Summary>();
+        Iterable<Document> docs;
+
+        if (folder == null) {
+            docs = this.documentStore
+                .getCollection(DocumentStoreService.Collections.EMAILS)
+                .find()
+                .projection(projection)
+                .sort(sorting);
+        } else {
+            docs = this.documentStore
+                .getCollection(DocumentStoreService.Collections.EMAILS)
+                .find(new Document(Email.Attributes.METADATA, new Document(Email.Metadata.METADATA_FOLDER, folder)))
+                .projection(projection)
+                .sort(sorting);
+        }
 
         for (Document doc : docs) {
             emails.add(new Email.Summary(doc));
@@ -55,8 +68,7 @@ public class ApiEmailController extends Controller {
         Document doc = this.documentStore
             .getCollection(DocumentStoreService.Collections.EMAILS)
             .find(eq(Email.Attributes.PUBLIC_ID, id))
-            .projection(fields(exclude(Email.Attributes.BUCKET_KEY,
-                Email.Attributes.BUCKET_OBJECT), excludeId()))
+            .projection(fields(exclude(Email.Attributes.BUCKET_KEY, Email.Attributes.BUCKET_OBJECT), excludeId()))
             .first();
 
         if (doc == null) {
@@ -75,14 +87,15 @@ public class ApiEmailController extends Controller {
         if (json == null) {
             return badRequest("Expecting JSON data");
         } else {
-            temporaryMetadata = json.findValue("email").findValue("metadata");
+            temporaryMetadata = json.findValue(Email.ENTITY_NAME).findValue(Email.Attributes.METADATA);
             if (temporaryMetadata == null) {
-                return badRequest("Only `metadata` is updatable");
+                return badRequest(String.format("Only `%s` is updatable", Email.Attributes.METADATA));
             } else {
                 metadata = (Email.Metadata) objectMapper.convertValue(temporaryMetadata, Email.Metadata.class);
                 this.documentStore
                     .getCollection(DocumentStoreService.Collections.EMAILS)
-                    .updateOne(eq(Email.Attributes.PUBLIC_ID, id), new Document("$set", new Document("metadata", metadata.toDocument())));
+                    .updateOne(eq(Email.Attributes.PUBLIC_ID, id),
+                        new Document("$set", new Document(Email.Attributes.METADATA, metadata.toDocument())));
                 return noContent();
             }
         }

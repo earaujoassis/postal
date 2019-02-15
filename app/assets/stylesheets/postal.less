@@ -15,7 +15,12 @@ a {
   }
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: inherit;
   font-weight: 500;
   font-size: inherit;
@@ -73,18 +78,19 @@ iframe {
   }
 
   .menu {
-    padding: 12px 20px;
+    padding: 12px 28px;
     font-weight: 500;
 
     > li {
-      padding: 4px 0;
+      padding: 6px 0;
 
       .active {
         color: #fff;
       }
 
       a {
-        padding: 6px 8px;
+        position: relative;
+        padding: 8px 10px;
         border-radius: 4px;
         display: flex;
         flex-direction: row;
@@ -92,11 +98,69 @@ iframe {
         color: #637385;
         background: transparent;
         transition: background 0.5s;
+        padding-left: 36px;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: inherit;
           background: #292e34;
           transition: background 0.5s;
+        }
+
+        &.inbox:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          mask-image: url(/assets/images/inbox.svg);
+          mask-size: 22px auto;
+          mask-position: center;
+          mask-repeat: no-repeat;
+          background-color: #637385;
+          width: 26px;
+        }
+
+        &.sent:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          mask-image: url(/assets/images/cursor.svg);
+          mask-size: 22px auto;
+          mask-position: center;
+          mask-repeat: no-repeat;
+          background-color: #637385;
+          width: 26px;
+        }
+
+        &.drafts:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          mask-image: url(/assets/images/edit.svg);
+          mask-size: 21px auto;
+          mask-position: center;
+          mask-repeat: no-repeat;
+          background-color: #637385;
+          width: 26px;
+        }
+
+        &.trash:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          mask-image: url(/assets/images/garbage.svg);
+          mask-size: 22px auto;
+          mask-position: center;
+          mask-repeat: no-repeat;
+          background-color: #637385;
+          width: 26px;
         }
       }
     }
@@ -128,7 +192,10 @@ iframe {
   cursor: pointer;
   transition: border-left 0.25s;
 
-  &:hover, &:focus, &:focus-within, &.active {
+  &:hover,
+  &:focus,
+  &:focus-within,
+  &.active {
     box-shadow: inset 2px 0 20px 0 rgba(41, 46, 52, 0.0625);
     background: #dee2e7;
     transition: border-left 0.25s;
@@ -142,7 +209,7 @@ iframe {
 
   &.active,
   &.active.read {
-    border-left: 5px solid #1094f6;
+    border-left: 5px solid #5a6e8f;
     transition: border-left 0.25s;
   }
 
@@ -222,11 +289,19 @@ iframe {
     }
   }
 
-  .body-header {
+  .body-header,
+  .body-actions {
     display: flex;
     flex-direction: row;
     padding: 28px;
     border-bottom: 1px solid #e4e5e7;
+    position: -moz-sticky;
+  }
+
+  .body-actions {
+    padding: 16px 28px;
+    justify-content: right;
+    font-size: 0.9rem;
   }
 
   .body-meta-box {
@@ -257,14 +332,53 @@ iframe {
   }
 }
 
+/* ======== Buttons */
+
+.buttons {
+  display: inline-block;
+  border: 1px solid #e4e5e7;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 500;
+
+  &.button-trash {
+    border: 0;
+    padding-left: 30px;
+    background-image: url(/assets/images/garbage.svg);
+    background-size: 22px auto;
+    background-position: left center;
+    background-repeat: no-repeat;
+  }
+
+  &.button-envelope {
+    border: 0;
+    padding-left: 30px;
+    background-image: url(/assets/images/envelope.svg);
+    background-size: 22px auto;
+    background-position: left center;
+    background-repeat: no-repeat;
+  }
+}
+
 /* ======== Generics */
 
-.menu,
 .entries,
-.replies {
+.replies,
+.actions,
+.menu {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.actions {
+  > li {
+    display: inline-block;
+    padding: 0px 8px;
+  }
 }
 
 .italic {

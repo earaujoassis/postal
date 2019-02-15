@@ -7,11 +7,11 @@
           <span>Postal</span>
         </h1>
         <ul class="menu">
-          <li><a class="active" href="/">Inbox <span class="counter">{{ unReadEmails }}</span></a></li>
-          <li><a href="/all-mail">All mail</a></li>
-          <li><a href="/sent">Sent</a></li>
-          <li><a href="/drafts">Drafts</a></li>
-          <li><a href="/trash">Trash</a></li>
+          <li><router-link class="inbox" to="/">Inbox <span class="counter">{{ unReadEmails }}</span></router-link></li>
+          <li><router-link class="all-mail" to="/all-mail">All mail</router-link></li>
+          <li><router-link class="sent" to="/sent">Sent</router-link></li>
+          <li><router-link class="drafts" to="/drafts">Drafts</router-link></li>
+          <li><router-link class="trash" to="/trash">Trash</router-link></li>
         </ul>
       </div>
       <footer class="footer">
@@ -22,7 +22,7 @@
       <ul class="entries" role="tablist">
         <li v-for="entry in state.emails">
           <div
-            @click="fetchEmail(entry.publicId)"
+            @click="openEmailView(entry.publicId)"
             v-bind:id="entry.publicId"
             v-bind:class="{ 'entry-box': true, read: entry.isRead(), active: entry.isActive(state.currentEmail) }"
             aria-selected="false"
@@ -38,51 +38,13 @@
       </ul>
     </div>
     <div class="body" id="body-corpus-id">
-      <div v-if="state.currentEmail" class="body-header">
-        <span class="user-avatar"></span>
-        <div class="body-meta-box">
-          <h2 class="body-subject">{{ state.currentEmail.subject }}</h2>
-          <p><span class="user-name">{{ state.currentEmail.origin() }}</span> to {{ state.currentEmail.to[0] }}</p>
-        </div>
-      </div>
-      <div v-if="state.currentEmail" class="body-corpus">
-        <iframe
-          @load="fixIFrameHeight"
-          ref="currentEmailIFrame"
-          v-if="state.currentEmail.bodyHTML"
-          v-bind:srcdoc="state.currentEmail.bodyHTML"
-          frameborder="0"
-          height="0"
-          scrolling="no"></iframe>
-        <div v-else v-html="state.currentEmail.corpus()"></div>
-      </div>
-      <!-- <ul class="replies">
-        <li>
-          <div class="body-reply">
-            <div class="body-header">
-              <span class="user-avatar"></span>
-              <div class="body-meta-box">
-                <p><span class="user-name">Carlos Assis</span> to wired@newsletters.wired.com</p>
-              </div>
-            </div>
-            <div class="body-corpus">
-              <p>Hey, WIRED!</p>
-              <p>
-                Integer elementum mattis massa quis placerat. Nunc non nisi pellentesque, auctor elit ut, dignissim enim.
-                Nulla interdum orci nunc, in vulputate lacus sollicitudin non. Etiam molestie condimentum nisi ut auctor. Fusce
-                sodales malesuada odio sed finibus. Curabitur accumsan neque suscipit, pellentesque dui non, porta quam.
-              </p>
-              <p>Sincerely,<br>Carlos Assis</p>
-            </div>
-          </div>
-        </li>
-      </ul> -->
+      <router-view v-bind:key="$route.fullPath"></router-view>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from "vue-property-decorator";
+  import { Component, Watch, Vue } from "vue-property-decorator";
   import { State, Action, Getter } from "vuex-class";
 
   import { EmailsState } from "../emails/types";
@@ -93,25 +55,13 @@
   export default class App extends Vue {
       @State("emails") state!: EmailsState;
       @Action("fetchEmailsData", { namespace }) fetchEmailsData: any;
-      @Action("fetchEmailData", { namespace }) fetchEmailData: any;
-      @Action("markEmailsAsRead", { namespace }) markEmailsAsRead: any;
 
       mounted() {
         this.fetchEmailsData();
       }
 
-      fetchEmail(publicId: string) {
-        this.fetchEmailData(publicId);
-
-        let emailMetadata: any = this.state.emails.filter(email => email.publicId === publicId)[0].metadata;
-        if (emailMetadata.read === false) {
-          this.markEmailsAsRead(publicId);
-        }
-      }
-
-      fixIFrameHeight() {
-        let ref: any = this.$refs["currentEmailIFrame"];
-        ref.style.height = `${ref.contentWindow.document.body.scrollHeight}` + "px";
+      openEmailView(publicId: string) {
+        this.$router.push(`/${this.state.folder}/email/${publicId}`);
       }
 
       get unReadEmails() {

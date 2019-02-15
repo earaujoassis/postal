@@ -95,6 +95,7 @@ export class EmailFull extends EmailSummary {
 }
 
 export interface EmailsState {
+    folder: string;
     emails: Array<EmailSummary>;
     currentEmail?: EmailFull;
     error: boolean;

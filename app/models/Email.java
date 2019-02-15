@@ -12,6 +12,8 @@ import utils.RandomStringGenerator;
 
 public class Email {
 
+    public final static String ENTITY_NAME = "email";
+
     public static class Attributes {
         public final static String PUBLIC_ID = "publicId";
         public final static String BUCKET_KEY = "bucketKey";
@@ -109,19 +111,24 @@ public class Email {
     public static class Metadata {
 
         public final static String METADATA_READ = "read";
+        public final static String METADATA_FOLDER = "folder";
 
         public final boolean read;
+        public final String folder;
 
         public Metadata() {
             this.read = false;
+            this.folder = null;
         }
 
         public Metadata(Document doc) {
             this.read = doc.get(METADATA_READ, Boolean.class).booleanValue();
+            this.folder = doc.get(METADATA_FOLDER, String.class);
         }
 
         public Document toDocument() {
-            return new Document(METADATA_READ, this.read);
+            return new Document(METADATA_READ, this.read)
+                .append(METADATA_FOLDER, this.folder);
         }
 
     }

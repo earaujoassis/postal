@@ -18,9 +18,4 @@ public class HomeController extends Controller {
         return ok(views.html.index.render());
     }
 
-
-    public Result email(String _id) {
-        return this.index();
-    }
-
 }

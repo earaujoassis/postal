@@ -58,7 +58,9 @@ public class SyncMessagesActor extends AbstractActor {
       return receiveBuilder()
         .match(Request.class, request -> {
             String reply = "all-done";
-            syncMessages();
+            if (request.isSync()) {
+                syncMessages();
+            }
             sender().tell(reply, self());
         })
         .build();
