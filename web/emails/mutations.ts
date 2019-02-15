@@ -11,6 +11,16 @@ export const mutations: MutationTree<EmailsState> = {
         state.error = false;
         state.currentEmail = email;
     },
+    emailRead(state, publicId: string) {
+        let emails: Array<EmailSummary> = state.emails;
+        for (let email of emails) {
+            if (email.publicId === publicId) {
+                email.metadata.read = true;
+                break;
+            }
+        }
+        state.emails = emails;
+    },
     emailsError(state) {
         state.error = true;
     }
