@@ -4,7 +4,7 @@
  * two arguments, a `String` for the title of the page and an `Html`
  * object to insert into the body of the page.
  *@
-@(title: String)(content: Html)
+@(title: String)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,11 +16,8 @@
         <link rel="shortcut icon" href="//cdn.quatrolabs.com/favicon.ico">
     </head>
     <body>
-        @* And here's where we render the `Html` object containing
-         * the page content. *@
-        @content
-
+        <div id="root"></div>
         <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-        <script src="@routes.Assets.versioned("javascripts/postal.js")"></script>
+        <script src="@routes.Assets.versioned("javascripts/build.js")"></script>
     </body>
 </html>

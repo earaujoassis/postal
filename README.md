@@ -8,7 +8,7 @@ are checked by default to address spams and viruses); the Postal application obt
 messages and handles it inside the application. Email messages are also sent through the
 AWS SES infrastructure. The application also supports encrypting and decrypting messages.
 
-The application is using Play + Java on the back-end and Less + vanilla TypeScript on the front-end.
+The application is using Play + Java on the back-end and Vuejs + TypeScript + LESS on the front-end.
 
 ## Setup & Running
 

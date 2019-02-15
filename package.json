@@ -1,0 +1,42 @@
+{
+  "name": "postal",
+  "version": "0.1.0",
+  "description": "A security- and privacy-first, mobile-first, and offline-first mail service application",
+  "main": "none",
+  "dependencies": {
+    "vue-property-decorator": "^7.3.0"
+  },
+  "devDependencies": {
+    "css-loader": "^2.1.0",
+    "ts-loader": "^5.3.3",
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.3",
+    "vue": "^2.6.6",
+    "vue-loader": "^15.6.2",
+    "vue-template-compiler": "^2.6.6",
+    "vuex": "^3.1.0",
+    "vuex-class": "^0.3.1",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
+  },
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/earaujoassis/postal.git"
+  },
+  "keywords": [
+    "postal",
+    "web",
+    "mail",
+    "app"
+  ],
+  "author": "Ewerton Carlos Assis <earaujoassis@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/earaujoassis/postal/issues"
+  },
+  "homepage": "https://github.com/earaujoassis/postal#readme"
+}
