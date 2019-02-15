@@ -7,7 +7,7 @@ body {
 }
 
 a {
-  color: #fff;
+  color: inherit;
   text-decoration: none;
 
   &:hover, &:visited {
@@ -51,7 +51,7 @@ iframe {
   flex-direction: row;
   align-items: center;
   height: 40px;
-  padding: 20px;
+  padding: 40px 28px 20px;
 
   > span {
     margin-left: 10px;
@@ -63,7 +63,8 @@ iframe {
   flex-direction: column;
   justify-content: space-between;
   flex: 1 0;
-  background: #1f2524;
+  max-width: 16vw;
+  background: #27323f;
   color: #fff;
   overflow: hidden;
 
@@ -72,21 +73,28 @@ iframe {
   }
 
   .menu {
-    padding: 14px;
+    padding: 12px 20px;
+    font-weight: 500;
 
     > li {
       padding: 4px 0;
 
+      .active {
+        color: #fff;
+      }
+
       a {
-        padding: 4px 6px;
+        padding: 6px 8px;
         border-radius: 4px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+        color: #637385;
         background: transparent;
         transition: background 0.5s;
 
         &:hover, &:focus {
+          color: inherit;
           background: #292e34;
           transition: background 0.5s;
         }
@@ -95,10 +103,9 @@ iframe {
   }
 
   .footer {
-    padding: 16px 20px 26px;
-    background: #292e34;
+    padding: 16px 28px 26px;
     font-size: 0.8rem;
-    font-weight: 300;
+    font-weight: 500;
   }
 }
 
@@ -106,6 +113,7 @@ iframe {
   position: relative;
   z-index: 100;
   flex: 2 0;
+  max-width: 26vw;
   border-right: 1px solid #e4e5e7;
   box-shadow: 2px 0 20px 0 rgba(32, 130, 195, 0.125);
   overflow-y: scroll;
@@ -114,18 +122,28 @@ iframe {
 
 .entry-box {
   padding: 20px 22px;
-  border-bottom: 1px solid #e4e5e7;
+  border-bottom: 1px solid #dee2e7;
+  border-left: 5px solid #f25653;
   line-height: 1.4;
   cursor: pointer;
+  transition: border-left 0.25s;
 
-  &:hover, &:focus, &:focus-within,
-  &.active {
+  &:hover, &:focus, &:focus-within, &.active {
     box-shadow: inset 2px 0 20px 0 rgba(41, 46, 52, 0.0625);
-    background: #f9fbfa;
+    background: #dee2e7;
+    transition: border-left 0.25s;
   }
 
   &.read {
-    background: #f9fbfa;
+    background: #f6f8fa;
+    border-left: 0;
+    transition: border-left 0.25s;
+  }
+
+  &.active,
+  &.active.read {
+    border-left: 5px solid #1094f6;
+    transition: border-left 0.25s;
   }
 
   .entry-header {
@@ -219,7 +237,8 @@ iframe {
 
   .body-subject {
     font-weight: 500;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+    margin-bottom: 6px;
   }
 
   .body-corpus {

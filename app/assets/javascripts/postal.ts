@@ -21,6 +21,8 @@ interface EmailCommons {
 }
 
 class EmailSummary implements EmailCommons {
+    static readonly ABSTRACT_CHAR_LIMIT = 64;
+
     publicId: string;
     sentAt: number;
     subject: string;
@@ -55,11 +57,11 @@ class EmailSummary implements EmailCommons {
         let abstract: string;
 
         if (this.bodyPlain) {
-            abstract = this.bodyPlain.trim().slice(0, 100);
-            abstract = this.bodyPlain.length > 100 ? abstract + "..." : abstract;
+            abstract = this.bodyPlain.trim().slice(0, EmailSummary.ABSTRACT_CHAR_LIMIT);
+            abstract = this.bodyPlain.length > EmailSummary.ABSTRACT_CHAR_LIMIT ? abstract.trim() + "..." : abstract;
         } else if (this.bodyHTML) {
             let text: string = (new DOMParser).parseFromString(this.bodyHTML, "text/html").documentElement.textContent;
-            abstract = text.trim().slice(0, 100) + "...";
+            abstract = text.trim().slice(0, EmailSummary.ABSTRACT_CHAR_LIMIT).trim() + "...";
         } else {
             abstract = '<span class="italic">Not available...</span>';
         }
@@ -190,7 +192,12 @@ const Streams: any = {
         let parentApplier = document.querySelector("div.body");
         let target: Element = payload.target;
 
+        if (document.querySelector("div.entry-box.active")) {
+            document.querySelector("div.entry-box.active").classList.remove("active");
+        }
+
         target.setAttribute("aria-selected", "true");
+        target.classList.add("active");
         while (parentApplier.firstChild) {
             parentApplier.removeChild(parentApplier.firstChild);
         }
