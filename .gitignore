@@ -15,3 +15,5 @@ server.pid
 /dist/
 .cache
 conf/secrets.conf
+public/javascripts/build.js
+node_modules/
