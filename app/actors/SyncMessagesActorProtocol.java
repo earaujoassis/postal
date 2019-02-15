@@ -8,5 +8,9 @@ public class SyncMessagesActorProtocol {
         public Request(String command) {
             this.command = command;
         }
+
+        public boolean isSync() {
+            return this.command == "sync";
+        }
     }
 }

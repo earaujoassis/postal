@@ -3082,6 +3082,11 @@ vue-property-decorator@^7.3.0:
   dependencies:
     vue-class-component "^6.2.0"
 
+vue-router@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.2.tgz#dedc67afe6c4e2bc25682c8b1c2a8c0d7c7e56be"
+  integrity sha512-opKtsxjp9eOcFWdp6xLQPLmRGgfM932Tl56U9chYTnoWqKxQ8M20N7AkdEbM5beUh6wICoFGYugAX9vQjyJLFg==
+
 vue-style-loader@^4.1.0:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.1.2.tgz#dedf349806f25ceb4e64f3ad7c0a44fba735fcf8"
@@ -3112,6 +3117,11 @@ vuex-class@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/vuex-class/-/vuex-class-0.3.1.tgz#3c0b946bcff4cf2be1904de5b0cab1a3dd5c41d5"
   integrity sha512-d7Hc+ItQx6p9E/2mEWiyrvyEuo7Uj0mq4VNImd7dmxTelnkhOavKPMEG1Xdypug2RlPEYv0920IOa3hdVZ+4AA==
+
+vuex-router-sync@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/vuex-router-sync/-/vuex-router-sync-5.0.0.tgz#1a225c17a1dd9e2f74af0a1b2c62072e9492b305"
+  integrity sha512-Mry2sO4kiAG64714X1CFpTA/shUH1DmkZ26DFDtwoM/yyx6OtMrc+MxrU+7vvbNLO9LSpgwkiJ8W+rlmRtsM+w==
 
 vuex@^3.1.0:
   version "3.1.0"

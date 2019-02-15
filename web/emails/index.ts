@@ -7,6 +7,7 @@ import { EmailsState } from "./types";
 import { RootState } from "../types";
 
 export const state: EmailsState = {
+    folder: "inbox",
     emails: [],
     currentEmail: undefined,
     error: false

@@ -51,5 +51,55 @@ export const actions: ActionTree<EmailsState, RootState> = {
             console.error(error);
             commit("emailsError");
         });
+    },
+
+    markEmailsAsUnread({ commit }, publicId): any {
+        fetch(`/api/emails/${publicId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+            body: JSON.stringify({
+                email: {
+                    metadata: {
+                        read: false
+                    }
+                }
+            })
+        })
+        .then(function(response) {
+            if (response.status >= 200 && response.status < 300) {
+                commit("emailUnread", publicId);
+            } else {
+                throw new Error(`server responded with status: ${response.status}`);
+            }
+        })
+        .catch(function(error) {
+            console.error(error);
+            commit("emailsError");
+        });
+    },
+
+    moveEmailToFolder({ commit }, publicId, folder): any {
+        fetch(`/api/emails/${publicId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+            body: JSON.stringify({
+                email: {
+                    metadata: {
+                        folder: folder
+                    }
+                }
+            })
+        })
+        .then(function(response) {
+            if (response.status >= 200 && response.status < 300) {
+                commit("emailUnread", publicId);
+            } else {
+                throw new Error(`server responded with status: ${response.status}`);
+            }
+        })
+        .catch(function(error) {
+            console.error(error);
+            commit("emailsError");
+        });
     }
 };
