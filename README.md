@@ -13,9 +13,15 @@ the front-end.
 
 ## Setup & Running
 
-Please make sure to install Java 8, Gradle and SBT. Also, you must create a `conf/secrets.conf`
-file according to the template configuration in `conf/secrets.sample.conf`. Once that is done,
-you may run `sbt run` to start the development server.
+Please make sure to install Java 8, Gradle, SBT, Node.js (Postal is developed over version
+8.15.0), and Yarn. Also, you must create a `conf/secrets.conf` file according to the template
+configuration in `conf/secrets.sample.conf`. Once those requirements are complete, you may
+run the following commands to start the development server:
+
+```sh
+$ yarn install && yarn build
+$ sbt run
+```
 
 ## Issues
 
