@@ -92,10 +92,12 @@ public class SyncMessagesActor extends AbstractActor {
         logger.info("Listing objects and checking for updates... (may take a while)");
         for (S3ObjectSummary objSummary : objectSummaries) {
             String messageKey = objSummary.getKey();
+            logger.info(String.format("Checking for the following key: %s", messageKey));
             if (this.documentStore
                     .getCollection(DocumentStoreService.Collections.EMAILS)
                     .find(eq(Email.Attributes.BUCKET_KEY, messageKey))
                     .first() == null) {
+                logger.info(String.format("Adding a new object with key %s", messageKey));
                 String rawMessage = s3Encryption.getObjectAsString(configuration.getString("postal.aws.bucket_name"), messageKey);
                 Session session = Session.getInstance(new Properties());
                 InputStream inputStream = new ByteArrayInputStream(rawMessage.getBytes());
@@ -121,6 +123,8 @@ public class SyncMessagesActor extends AbstractActor {
                         enrichedMessage.getHtmlContent());
                     this.documentStore.getCollection("emails").insertOne(emailDocument.toDocument());
                 } catch (Exception exc) {
+                    logger.error(exc.toString());
+                    exc.printStackTrace();
                     continue;
                 }
             }

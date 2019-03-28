@@ -208,7 +208,7 @@ public class Email {
             .append(Attributes.REPLY_TO, this.replyTo)
             .append(Attributes.BODY_PLAIN, this.bodyPlain)
             .append(Attributes.BODY_HTML, this.bodyHTML)
-            .append(Attributes.METADATA, this.metadata);
+            .append(Attributes.METADATA, this.metadata.toDocument());
     }
 
     public Summary toSummary() {
