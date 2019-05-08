@@ -29,13 +29,13 @@ public class SyncMessagesTask {
 
     private void initialize() {
         actorSystem.scheduler().schedule(
-            Duration.create(0, TimeUnit.SECONDS),
-            Duration.create(60, TimeUnit.SECONDS),
+            Duration.create(2, TimeUnit.MINUTES),
+            Duration.create(30, TimeUnit.MINUTES),
             syncMessagesActor,
             new Request("sync"),
             executionContext,
             ActorRef.noSender()
         );
-
     }
+
 }
