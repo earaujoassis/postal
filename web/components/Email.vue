@@ -66,8 +66,9 @@
   const namespace: string = "emails";
 
   @Component
-  export default class App extends Vue {
+  export default class Email extends Vue {
       @State("emails") state!: EmailsState;
+      @Action("fetchStatusData", { namespace }) fetchStatusData: any;
       @Action("fetchEmailData", { namespace }) fetchEmailData: any;
       @Action("markEmailsAsUnread", { namespace }) markEmailsAsUnread: any;
       @Action("markEmailsAsRead", { namespace }) markEmailsAsRead: any;
@@ -87,12 +88,14 @@
           let emailMetadata: any = this.state.currentEmail.metadata;
           if (emailMetadata.read === false) {
             this.markEmailsAsRead(this.$route.params.id);
+            this.fetchStatusData();
           }
         }
       }
 
       markAsUnread() {
         this.markEmailsAsUnread(this.$route.params.id);
+        this.fetchStatusData();
       }
 
       fixIFrameHeight() {

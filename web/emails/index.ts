@@ -10,7 +10,9 @@ export const state: EmailsState = {
     folder: "inbox",
     emails: [],
     currentEmail: undefined,
-    error: false
+    error: false,
+    total: 0,
+    unread: 0
 };
 
 const namespaced: boolean = true;
