@@ -54,7 +54,9 @@ export class EmailSummary implements EmailCommons {
     }
 
     relativeTime(): string {
-        return moment(new Date(this.sentAt), "YYYYMMDD").fromNow();
+        const sentAt = new Date(0);
+        sentAt.setUTCSeconds(this.sentAt);
+        return moment(sentAt, "YYYYMMDD").fromNow();
     }
 
     isRead(): boolean {
@@ -99,4 +101,6 @@ export interface EmailsState {
     emails: Array<EmailSummary>;
     currentEmail?: EmailFull;
     error: boolean;
+    total: number;
+    unread: number;
 }

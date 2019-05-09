@@ -17,3 +17,7 @@ server.pid
 conf/secrets.conf
 public/javascripts/build.js
 node_modules/
+vscode
+.gradle/
+.settings/
+.project
