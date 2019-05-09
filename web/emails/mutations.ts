@@ -4,6 +4,10 @@ import { EmailsState, EmailSummary, EmailFull } from "./types";
 import router from "../router";
 
 export const mutations: MutationTree<EmailsState> = {
+    statusLoaded(state, status: any) {
+        state.total = status.total;
+        state.unread = status.unread;
+    },
     emailsLoaded(state, emails: Array<EmailSummary>) {
         state.error = false;
         state.emails = emails;
