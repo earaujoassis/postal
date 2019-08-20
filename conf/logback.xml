@@ -34,6 +34,8 @@
   <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
 
   <logger name="actors.SyncMessagesActor" level="INFO" />
+  <logger name="services.AppConfig" level="INFO" />
+  <logger name="services.StoreService" level="INFO" />
 
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />
