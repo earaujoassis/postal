@@ -1,0 +1,9 @@
+postal:
+  aws:
+    access_key: AWS_ACCESS_KEY
+    secret_access_key: AWS_SECRET_ACCESS_KEY
+    region: us-east-1
+  key: KEY
+  bucket:
+    name: AWS_S3_BUCKET_NAME
+    prefix: AWS_S3_KEY_PREFIX

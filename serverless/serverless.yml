@@ -1,0 +1,18 @@
+service: postal-serverless
+
+frameworkVersion: ">=1.2.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: java8
+
+package:
+  artifact: build/distributions/postal-serverless.zip
+
+functions:
+  currentTime:
+    handler: com.carlosassis.postal.Handler
+    events:
+      - http:
+          path: ping
+          method: get
