@@ -2,8 +2,6 @@ package actors;
 
 import akka.actor.*;
 import akka.japi.*;
-import com.typesafe.config.Config;
-import play.api.Configuration;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 import javax.mail.Session;
@@ -14,7 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Properties;
-import com.mongodb.client.model.Filters;
+import java.time.ZoneOffset;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -32,21 +30,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import actors.SyncMessagesActorProtocol.Request;
-import services.DocumentStoreService;
+import services.AppConfig;
+import services.EmailService;
 import models.Email;
-
-import static com.mongodb.client.model.Filters.eq;
 
 public class SyncMessagesActor extends AbstractActor {
 
     private final static Logger logger = LoggerFactory.getLogger(SyncMessagesActor.class);
-    private Config configuration;
-    private DocumentStoreService documentStore;
+    private AppConfig conf;
+    private EmailService emailService;
 
     @Inject
-    public SyncMessagesActor(Config configuration, DocumentStoreService documentStore) {
-        this.configuration = configuration;
-        this.documentStore = documentStore;
+    public SyncMessagesActor(AppConfig conf, EmailService emailService) {
+        this.conf = conf;
+        this.emailService = emailService;
     }
 
     public static Props getProps() {
@@ -69,18 +66,16 @@ public class SyncMessagesActor extends AbstractActor {
     public void syncMessages() throws MessagingException {
         logger.info("Starting the sync messages task");
         logger.info("Attempting a connection with the ASW S3 Bucket");
-        AWSCredentials credentials = new BasicAWSCredentials(configuration.getString("postal.aws.access_key"),
-            configuration.getString("postal.aws.secret_access_key"));
+        AWSCredentials credentials = new BasicAWSCredentials(conf.getValue("aws.access_key"), conf.getValue("aws.secret_access_key"));
         AmazonS3Encryption s3Encryption = AmazonS3EncryptionClientBuilder
             .standard()
             .withCredentials(new AWSStaticCredentialsProvider(credentials))
             .withRegion(Regions.US_EAST_1)
             .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.EncryptionOnly).withAwsKmsRegion(Region.getRegion(Regions.US_EAST_1)))
-            .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(configuration.getString("postal.aws.kms_key")))
+            .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(conf.getValue("aws.kms_key")))
             .build();
         logger.info("Connection established; obtaining list of objects");
-        ListObjectsV2Result bucket = s3Encryption.listObjectsV2(configuration.getString("postal.aws.bucket_name"),
-            configuration.getString("postal.aws.bucket_prefix"));
+        ListObjectsV2Result bucket = s3Encryption.listObjectsV2(conf.getValue("aws.bucket_name"), conf.getValue("aws.bucket_prefix"));
         List<S3ObjectSummary> objectSummaries = bucket.getObjectSummaries();
         objectSummaries.sort(new Comparator<S3ObjectSummary>() {
             @Override
@@ -93,12 +88,9 @@ public class SyncMessagesActor extends AbstractActor {
         for (S3ObjectSummary objSummary : objectSummaries) {
             String messageKey = objSummary.getKey();
             logger.info(String.format("Checking for the following key: %s", messageKey));
-            if (this.documentStore
-                    .getCollection(DocumentStoreService.Collections.EMAILS)
-                    .find(eq(Email.Attributes.BUCKET_KEY, messageKey))
-                    .first() == null) {
+            if (!this.emailService.isEmailAvailable(messageKey)) {
                 logger.info(String.format("Adding a new object with key %s", messageKey));
-                String rawMessage = s3Encryption.getObjectAsString(configuration.getString("postal.aws.bucket_name"), messageKey);
+                String rawMessage = s3Encryption.getObjectAsString(conf.getValue("aws.bucket_name"), messageKey);
                 Session session = Session.getInstance(new Properties());
                 InputStream inputStream = new ByteArrayInputStream(rawMessage.getBytes());
                 MimeMessage message;
@@ -111,7 +103,7 @@ public class SyncMessagesActor extends AbstractActor {
                     enrichedMessage.parse();
                     emailDocument = new Email(messageKey,
                         rawMessage,
-                        message.getSentDate(),
+                        message.getSentDate().toInstant().atOffset(ZoneOffset.UTC),
                         enrichedMessage.getSubject(),
                         enrichedMessage.getFrom(),
                         ((InternetAddress) message.getFrom()[0]).getPersonal(),
@@ -121,12 +113,16 @@ public class SyncMessagesActor extends AbstractActor {
                         enrichedMessage.getReplyTo(),
                         enrichedMessage.getPlainContent(),
                         enrichedMessage.getHtmlContent());
-                    this.documentStore.getCollection("emails").insertOne(emailDocument.toDocument());
+                    this.emailService.insert(emailDocument);
                 } catch (Exception exc) {
                     logger.error(exc.toString());
                     exc.printStackTrace();
                     continue;
                 }
+            } else {
+                logger.info("No new objects found; breaking loop");
+                // It reached a document that was already imported; break loop
+                break;
             }
         }
         logger.info("Objects synced with the datastore");

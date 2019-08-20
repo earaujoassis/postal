@@ -7,7 +7,7 @@
           <span>Postal</span>
         </h1>
         <ul class="menu">
-          <li><router-link class="inbox" to="/">Inbox <span class="counter">{{ unReadEmails }}</span></router-link></li>
+          <li><router-link class="inbox" to="/">Inbox <span class="counter">{{ state.unread }}</span></router-link></li>
           <li><router-link class="all-mail" to="/all-mail">All mail</router-link></li>
           <li><router-link class="sent" to="/sent">Sent</router-link></li>
           <li><router-link class="drafts" to="/drafts">Drafts</router-link></li>
@@ -19,8 +19,11 @@
       </footer>
     </div>
     <div class="listing">
+      <div class="listing-header">
+        <p>1&ndash;10 of {{ state.total }} messages</p>
+      </div>
       <ul class="entries" role="tablist">
-        <li v-for="entry in state.emails">
+        <li v-for="entry in state.emails" v-bind:key="entry.publicId">
           <div
             @click="openEmailView(entry.publicId)"
             v-bind:id="entry.publicId"
@@ -55,24 +58,15 @@
   export default class App extends Vue {
       @State("emails") state!: EmailsState;
       @Action("fetchEmailsData", { namespace }) fetchEmailsData: any;
+      @Action("fetchStatusData", { namespace }) fetchStatusData: any;
 
       mounted() {
+        this.fetchStatusData();
         this.fetchEmailsData();
       }
 
       openEmailView(publicId: string) {
         this.$router.push(`/${this.state.folder}/email/${publicId}`);
-      }
-
-      get unReadEmails() {
-        let counter = 0;
-
-        if (this.state && this.state.emails && this.state.emails.length) {
-          const entries: Array<any> = this.state.emails;
-          counter = entries.reduce((accumulator, entry) => entry.metadata.read ? accumulator : accumulator + 1, 0);
-        }
-
-        return counter;
       }
   }
 </script>

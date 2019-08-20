@@ -1,11 +1,11 @@
 package models;
 
+import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.regex.Pattern;
 import javax.mail.Address;
-import org.bson.Document;
 import org.jsoup.Jsoup;
 
 import utils.RandomStringGenerator;
@@ -33,7 +33,7 @@ public class Email {
 
     public static class Summary {
         public final String publicId;
-        public final Date sentAt;
+        public final OffsetDateTime sentAt;
         public final String subject;
         public final String from;
         public final String fromPersonal;
@@ -51,10 +51,6 @@ public class Email {
             this.bodyPlain = source.bodyPlain;
             this.bodyHTML = source.bodyHTML;
             this.metadata = source.metadata;
-        }
-
-        public Summary(Document doc) {
-            this(new Email(doc));
         }
 
         public String getExcerpt() {
@@ -76,7 +72,7 @@ public class Email {
 
     public static class Presentation {
         public final String publicId;
-        public final Date sentAt;
+        public final OffsetDateTime sentAt;
         public final String subject;
         public final String from;
         public final String fromPersonal;
@@ -102,10 +98,6 @@ public class Email {
             this.bodyHTML = source.bodyHTML;
             this.metadata = source.metadata;
         }
-
-        public Presentation(Document doc) {
-            this(new Email(doc));
-        }
     }
 
     public static class Metadata {
@@ -121,14 +113,11 @@ public class Email {
             this.folder = null;
         }
 
-        public Metadata(Document doc) {
-            this.read = doc.get(METADATA_READ, Boolean.class).booleanValue();
-            this.folder = doc.get(METADATA_FOLDER, String.class);
-        }
+        public Metadata(Object hash) {
+            Map<String, Object> metadata = (Map<String, Object>) hash;
 
-        public Document toDocument() {
-            return new Document(METADATA_READ, this.read)
-                .append(METADATA_FOLDER, this.folder);
+            this.read = ((Boolean) metadata.get(METADATA_READ)).booleanValue();
+            this.folder = (String) metadata.get(METADATA_FOLDER);
         }
 
     }
@@ -136,7 +125,7 @@ public class Email {
     public final String publicId;
     public final String bucketKey;
     public final String bucketObject;
-    public final Date sentAt;
+    public final OffsetDateTime sentAt;
     public final String subject;
     public final String from;
     public final String fromPersonal;
@@ -150,7 +139,7 @@ public class Email {
 
     public Email(final String bucketKey,
                  final String bucketObject,
-                 final Date sentAt,
+                 final OffsetDateTime sentAt,
                  final String subject,
                  final String from,
                  final String fromPersonal,
@@ -177,38 +166,23 @@ public class Email {
         this.metadata = new Metadata();
     }
 
-    public Email(Document doc) {
-        this.publicId = doc.get(Attributes.PUBLIC_ID, String.class);
-        this.bucketKey = doc.get(Attributes.BUCKET_KEY, String.class);
-        this.bucketObject = doc.get(Attributes.BUCKET_OBJECT, String.class);
-        this.sentAt = doc.get(Attributes.SENT_AT, Date.class);
-        this.subject = doc.get(Attributes.SUBJECT, String.class);
-        this.from = doc.get(Attributes.FROM, String.class);
-        this.fromPersonal = doc.get(Attributes.FROM_PERSONAL, String.class);
-        this.to = doc.get(Attributes.TO, ArrayList.class);
-        this.bcc = doc.get(Attributes.BCC, ArrayList.class);
-        this.cc = doc.get(Attributes.CC, ArrayList.class);
-        this.replyTo = doc.get(Attributes.REPLY_TO, String.class);
-        this.bodyPlain = doc.get(Attributes.BODY_PLAIN, String.class);
-        this.bodyHTML = doc.get(Attributes.BODY_HTML, String.class);
-        this.metadata = new Metadata((Document) doc.get(Attributes.METADATA));
-    }
+    public Email(Object hash) {
+        Map<String, Object> email = (Map<String, Object>) hash;
 
-    public Document toDocument() {
-        return new Document(Attributes.PUBLIC_ID, this.publicId)
-            .append(Attributes.BUCKET_KEY, this.bucketKey)
-            .append(Attributes.BUCKET_OBJECT, this.bucketObject)
-            .append(Attributes.SENT_AT, this.sentAt)
-            .append(Attributes.SUBJECT, this.subject)
-            .append(Attributes.FROM, this.from)
-            .append(Attributes.FROM_PERSONAL, this.fromPersonal)
-            .append(Attributes.TO, this.to)
-            .append(Attributes.BCC, this.bcc)
-            .append(Attributes.CC, this.cc)
-            .append(Attributes.REPLY_TO, this.replyTo)
-            .append(Attributes.BODY_PLAIN, this.bodyPlain)
-            .append(Attributes.BODY_HTML, this.bodyHTML)
-            .append(Attributes.METADATA, this.metadata.toDocument());
+        this.publicId = (String) email.get(Attributes.PUBLIC_ID);
+        this.bucketKey = (String) email.get(Attributes.BUCKET_KEY);
+        this.bucketObject = (String) email.get(Attributes.BUCKET_OBJECT);
+        this.sentAt = OffsetDateTime.parse((String) email.get(Attributes.SENT_AT));
+        this.subject = (String) email.get(Attributes.SUBJECT);
+        this.from = (String) email.get(Attributes.FROM);
+        this.fromPersonal = (String) email.get(Attributes.FROM_PERSONAL);
+        this.to = (List<String>) email.get(Attributes.TO);
+        this.bcc = (List<String>) email.get(Attributes.BCC);
+        this.cc = (List<String>) email.get(Attributes.CC);
+        this.replyTo = (String) email.get(Attributes.REPLY_TO);
+        this.bodyPlain = (String) email.get(Attributes.BODY_PLAIN);
+        this.bodyHTML = (String) email.get(Attributes.BODY_HTML);
+        this.metadata = new Metadata(email.get(Attributes.METADATA));
     }
 
     public Summary toSummary() {

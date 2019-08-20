@@ -9,14 +9,15 @@ messages and handles it inside the application. Email messages are also sent thr
 AWS SES infrastructure. The application also supports encrypting and decrypting messages.
 
 The application is using Play + Java on the back-end and Vuejs + Vuex + TypeScript + LESS on
-the front-end.
+the front-end. It also uses a Vault scheme to store application configuration settings.
 
 ## Setup & Running
 
-Please make sure to install Java 8, Gradle, SBT, Node.js (Postal is developed over version
+Please make sure to install Java 8+, Gradle, SBT, Node.js (Postal is developed over version
 8.15.0), and Yarn. Also, you must create a `conf/secrets.conf` file according to the template
-configuration in `conf/secrets.sample.conf`. Once those requirements are complete, you may
-run the following commands to start the development server:
+configuration in `conf/secrets.sample.conf` to connect to a Vault k/v secret. The secret
+has the format according to the `conf/config.local.sample.json` file. Once those requirements
+are complete, you may run the following commands to start the development server:
 
 ```sh
 $ yarn install && yarn build
