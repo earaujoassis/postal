@@ -162,7 +162,7 @@ public class Email {
         this.bodyPlain = bodyPlain;
         this.bodyHTML = bodyHTML;
 
-        this.publicId = RandomStringGenerator.generate(32);
+        this.publicId = RandomStringGenerator.generate(64);
         this.metadata = new Metadata();
     }
 
