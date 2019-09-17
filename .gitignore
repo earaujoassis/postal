@@ -15,6 +15,7 @@ server.pid
 /dist/
 .cache
 conf/secrets.conf
+conf/config.local.json
 public/javascripts/build.js
 node_modules/
 vscode
