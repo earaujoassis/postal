@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import com.rethinkdb.net.Cursor;
-
-import static com.rethinkdb.RethinkDB.r;
 
 import models.Email;
 
@@ -21,39 +18,31 @@ public class EmailService {
     @Inject
     public EmailService(StoreService store) {
         this.store = store;
-
-        List<String> tables = r.db(this.store.dbName).tableList().run(this.store.conn);
-        if (!tables.contains(EMAILS_TABLE)) {
-            r.db(this.store.dbName).tableCreate(EMAILS_TABLE).run(this.store.conn);
-            r.db(this.store.dbName).table(EMAILS_TABLE).indexCreate(Email.Attributes.PUBLIC_ID).run(this.store.conn);
-            r.db(this.store.dbName).table(EMAILS_TABLE).indexCreate(Email.Attributes.BUCKET_KEY).run(this.store.conn);
-            r.db(this.store.dbName).table(EMAILS_TABLE).indexCreate(Email.Attributes.SENT_AT).run(this.store.conn);
-        }
     }
 
     public Map<String, Long> status() {
         Map<String, Long> status = new HashMap<String, Long>();
-        status.put("total", (Long) r.db(this.store.dbName).table(EMAILS_TABLE)
+        /* status.put("total", (Long) r.db(this.store.dbName).table(EMAILS_TABLE)
             .count()
             .run(this.store.conn));
         status.put("unread", (Long) r.db(this.store.dbName).table(EMAILS_TABLE)
             .filter(row -> row.g(Email.Attributes.METADATA).g(Email.Metadata.METADATA_READ).eq(false))
             .count()
-            .run(this.store.conn));
+            .run(this.store.conn)); */
 
         return status;
     }
 
     public boolean isEmailAvailable(String key) {
-        return ((Long) r.db(this.store.dbName)
+        return true; /*((Long) r.db(this.store.dbName)
             .table(EMAILS_TABLE)
             .filter(row -> row.g(Email.Attributes.BUCKET_KEY).eq(key))
             .count()
-            .run(this.store.conn)).intValue() > 0;
+            .run(this.store.conn)).intValue() > 0;*/
     }
 
     public boolean insert(Email email) {
-        Map<String, Object> result = r.db(this.store.dbName).table(EMAILS_TABLE)
+        Map<String, Object> result = null; /*r.db(this.store.dbName).table(EMAILS_TABLE)
             .insert(
                 r.hashMap(Email.Attributes.PUBLIC_ID, email.publicId)
                     .with(Email.Attributes.BUCKET_KEY, email.bucketKey)
@@ -74,23 +63,25 @@ public class EmailService {
             )
             .run(this.store.conn);
 
-        return ((Long) result.get("inserted")).intValue() > 0;
+        return ((Long) result.get("inserted")).intValue() > 0; */
+        return true;
     }
 
     public boolean update(String id, Email.Metadata metadata) {
-        Map<String, Object> result = r.db(this.store.dbName)
+        Map<String, Object> result = null; /*r.db(this.store.dbName)
             .table(EMAILS_TABLE)
             .filter(row -> row.g(Email.Attributes.PUBLIC_ID).eq(id))
             .update(r.hashMap(Email.Attributes.METADATA, r.hashMap(Email.Metadata.METADATA_READ, metadata.read)
                 .with(Email.Metadata.METADATA_FOLDER, metadata.folder)))
             .run(this.store.conn);
 
-            return ((Long) result.get("replaced")).intValue() > 0;
+        return ((Long) result.get("replaced")).intValue() > 0;*/
+        return true;
     }
 
     public Iterable<Email> getAll(String folder) {
         List<Email> target = new ArrayList<>();
-        Iterable<Object> entries = r.db(this.store.dbName)
+        Iterable<Object> entries = null; /*r.db(this.store.dbName)
             .table(EMAILS_TABLE)
             .orderBy().optArg("index", r.desc(Email.Attributes.SENT_AT))
             .limit(10)
@@ -98,18 +89,19 @@ public class EmailService {
 
         for (Object hash : entries) {
             target.add(new Email(hash));
-        }
+        }*/
 
         return target;
     }
 
     public Email getOne(String id) {
-        Object entry = ((Cursor) r.db(this.store.dbName)
+        /*Object entry = ((Cursor) r.db(this.store.dbName)
             .table(EMAILS_TABLE)
             .filter(row -> row.g(Email.Attributes.PUBLIC_ID).eq(id))
             .run(this.store.conn)).toList().get(0);
 
-        return new Email(entry);
+        return new Email(entry);*/
+        return null;
     }
 
 }
