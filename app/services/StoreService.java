@@ -95,23 +95,28 @@ public class StoreService {
                 StringBuffer currentQuery = new StringBuffer();
                 logger.info(String.format("Migrating: %s", filename));
                 try {
+                    this.conn.setAutoCommit(false);
+                    currentStatement = this.conn.createStatement();
                     BufferedReader reader = new BufferedReader(new FileReader(file));
                     String line = reader.readLine();
                     currentQuery = new StringBuffer();
                     while (line != null) {
                         if (line.trim().endsWith(";")) {
                             currentQuery.append(line.trim());
-                            currentStatement = this.conn.createStatement();
-                            currentStatement.execute(currentQuery.toString());
+                            currentStatement.addBatch(currentQuery.toString());
                             currentQuery = new StringBuffer();
                         } else if (line.trim().length() > 0) {
                             currentQuery.append(line.trim());
                         }
                         line = reader.readLine();
                     }
+                    currentStatement.executeBatch();
+                    this.conn.commit();
                     preparedStatement = this.conn.prepareStatement("INSERT INTO migrations(filename) VALUES(?);");
                     preparedStatement.setString(1, filename);
                     preparedStatement.execute();
+                    this.conn.commit();
+                    this.conn.setAutoCommit(true);
                 } catch (SQLException e) {
                     logger.info(String.format("Failed statement: %s", currentQuery.toString()));
                     e.printStackTrace();
