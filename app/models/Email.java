@@ -14,22 +14,6 @@ public class Email {
 
     public final static String ENTITY_NAME = "email";
 
-    public static class Attributes {
-        public final static String PUBLIC_ID = "public_id";
-        public final static String BUCKET_KEY = "bucket_key";
-        public final static String SENT_AT = "sent_at";
-        public final static String SUBJECT = "subject";
-        public final static String FROM = "from_email";
-        public final static String FROM_PERSONAL = "from_personal";
-        public final static String TO = "to_email";
-        public final static String BCC = "bcc_email";
-        public final static String CC = "cc_email";
-        public final static String REPLY_TO = "reply_to";
-        public final static String BODY_PLAIN = "body_plain";
-        public final static String BODY_HTML = "body_html";
-        public final static String METADATA = "metadata";
-    }
-
     public static class Summary {
         public final String publicId;
         public final OffsetDateTime sentAt;
@@ -121,18 +105,59 @@ public class Email {
 
     }
 
+    public static class Attributes {
+        public final static String PUBLIC_ID = "public_id";
+        public final static String BUCKET_KEY = "bucket_key";
+        public final static String SENT_AT = "sent_at";
+        public final static String SUBJECT = "subject";
+        public final static String FROM = "from_email";
+        public final static String FROM_PERSONAL = "from_personal";
+        public final static String TO = "to_email";
+        public final static String BCC = "bcc_email";
+        public final static String CC = "cc_email";
+        public final static String REPLY_TO = "reply_to";
+        public final static String BODY_PLAIN = "body_plain";
+        public final static String BODY_HTML = "body_html";
+        public final static String METADATA = "metadata";
+    }
+
+    @SqlField(name = Attributes.PUBLIC_ID)
     public final String publicId;
+
+    @SqlField(name = Attributes.BUCKET_KEY)
     public final String bucketKey;
+
+    @SqlField(name = Attributes.SENT_AT)
     public final OffsetDateTime sentAt;
+
+    @SqlField(name = Attributes.SUBJECT)
     public final String subject;
+
+    @SqlField(name = Attributes.FROM)
     public final String from;
+
+    @SqlField(name = Attributes.FROM_PERSONAL)
     public final String fromPersonal;
+
+    @SqlField(name = Attributes.TO)
     public final List<String> to;
+
+    @SqlField(name = Attributes.BCC)
     public final List<String> bcc;
+
+    @SqlField(name = Attributes.CC)
     public final List<String> cc;
+
+    @SqlField(name = Attributes.REPLY_TO)
     public final String replyTo;
+
+    @SqlField(name = Attributes.BODY_PLAIN)
     public final String bodyPlain;
+
+    @SqlField(name = Attributes.BODY_HTML)
     public final String bodyHTML;
+
+    @SqlField(name = Attributes.METADATA)
     public final Metadata metadata;
 
     public Email(final String bucketKey,

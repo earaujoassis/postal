@@ -16,6 +16,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.User;
+import models.SqlField;
+import utils.StoreUtils;
 
 @Singleton
 public class UserRepository extends AbstractEntityRepository {
@@ -27,12 +29,8 @@ public class UserRepository extends AbstractEntityRepository {
         List<String> fieldsNames = new ArrayList<>();
         Field[] fields = User.Attributes.class.getDeclaredFields();
         for (Field field : fields) {
-            if (Modifier.isPublic(field.getModifiers())) {
-                try {
-                    fieldsNames.add((String) field.get(new User.Attributes()));
-                } catch (IllegalAccessException e) {
-                    // Do nothing
-                }
+            if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
+                fieldsNames.add(StoreUtils.getSqlFieldKey(field));
             }
         }
 
@@ -63,6 +61,30 @@ public class UserRepository extends AbstractEntityRepository {
         }
 
         return target;
+    }
+
+    public User getOne(String id) {
+        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ?",
+            this.allFields, this.tableName, User.Attributes.EXTERNAL_ID);
+        List<Map<String, Object>> results;
+        PreparedStatement pStmt;
+        ResultSet rs;
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setString(1, id);
+            rs = pStmt.executeQuery();
+            pStmt.close();
+            results = this.fromResultSetToListOfHashes(rs);
+        } catch (SQLException e) {
+            return null;
+        }
+
+        if (results.size() > 0) {
+            return new User(results.get(0));
+        }
+
+        return null;
     }
 
 }

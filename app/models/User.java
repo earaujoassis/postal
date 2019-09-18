@@ -6,12 +6,6 @@ public class User {
 
     public final static String ENTITY_NAME = "user";
 
-    public static class Attributes {
-        public final static String EXTERNAL_ID = "external_id";
-        public final static String FULL_NAME = "full_name";
-        public final static String METADATA = "metadata";
-    }
-
     public static class Metadata {
         public Metadata(Object json) {
         }
@@ -34,8 +28,19 @@ public class User {
         }
     }
 
+    public static class Attributes {
+        public final static String EXTERNAL_ID = "external_id";
+        public final static String FULL_NAME = "full_name";
+        public final static String METADATA = "metadata";
+    }
+
+    @SqlField(name = Attributes.EXTERNAL_ID)
     public final String externalId;
+
+    @SqlField(name = Attributes.FULL_NAME)
     public final String fullName;
+
+    @SqlField(name = Attributes.METADATA)
     public final Metadata metadata;
 
     public User(final String externalId,
