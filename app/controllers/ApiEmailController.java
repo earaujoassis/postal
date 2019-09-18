@@ -8,25 +8,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.ArrayList;
 
-import services.EmailService;
+import repositories.EmailRepository;
 import models.Email;
 
 public class ApiEmailController extends Controller {
 
-    private EmailService emailService;
+    private EmailRepository emailRepository;
 
     @Inject
-    public ApiEmailController(EmailService emailService) {
-        this.emailService = emailService;
+    public ApiEmailController(EmailRepository emailRepository) {
+        this.emailRepository = emailRepository;
     }
 
     public Result status() {
-        return ok(Json.toJson(this.emailService.status()));
+        return ok(Json.toJson(this.emailRepository.status()));
     }
 
     public Result list(String folder) {
         List<Email.Summary> emails = new ArrayList<Email.Summary>();
-        Iterable<Email> docs = docs = this.emailService.getAll(folder);
+        Iterable<Email> docs = docs = this.emailRepository.getAll(folder);
 
         for (Email doc : docs) {
             emails.add(new Email.Summary(doc));
@@ -36,7 +36,7 @@ public class ApiEmailController extends Controller {
     }
 
     public Result show(String id) {
-        Email doc = this.emailService.getOne(id);
+        Email doc = this.emailRepository.getOne(id);
 
         if (doc == null) {
             return ok(Json.toJson(null));
@@ -59,7 +59,7 @@ public class ApiEmailController extends Controller {
                 return badRequest(String.format("Only `%s` is updatable", Email.Attributes.METADATA));
             } else {
                 metadata = (Email.Metadata) objectMapper.convertValue(temporaryMetadata, Email.Metadata.class);
-                this.emailService.update(id, metadata);
+                this.emailRepository.update(id, metadata);
                 return noContent();
             }
         }
