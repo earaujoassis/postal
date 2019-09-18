@@ -73,9 +73,9 @@ public class StoreService {
 
         File[] files = new File("db/migrations").listFiles();
         for (File file : files) {
+            boolean alreadyMigrated = false;
             String filename = file.getName();
             ResultSet result;
-            boolean alreadyMigrated = false;
 
             logger.info(String.format("Checking migration file: %s", filename));
             try {
@@ -92,14 +92,13 @@ public class StoreService {
             }
 
             if (!alreadyMigrated) {
-                StringBuffer currentQuery = new StringBuffer();
                 logger.info(String.format("Migrating: %s", filename));
                 try {
                     this.conn.setAutoCommit(false);
                     currentStatement = this.conn.createStatement();
                     BufferedReader reader = new BufferedReader(new FileReader(file));
                     String line = reader.readLine();
-                    currentQuery = new StringBuffer();
+                    StringBuffer currentQuery = new StringBuffer();
                     while (line != null) {
                         if (line.trim().endsWith(";")) {
                             currentQuery.append(line.trim());
@@ -111,18 +110,34 @@ public class StoreService {
                         line = reader.readLine();
                     }
                     currentStatement.executeBatch();
-                    this.conn.commit();
                     preparedStatement = this.conn.prepareStatement("INSERT INTO migrations(filename) VALUES(?);");
                     preparedStatement.setString(1, filename);
                     preparedStatement.execute();
                     this.conn.commit();
                     this.conn.setAutoCommit(true);
                 } catch (SQLException e) {
-                    logger.info(String.format("Failed statement: %s", currentQuery.toString()));
+                    logger.info(String.format("Something unexpected happened on file %s", file.getName()));
                     e.printStackTrace();
                 } catch (IOException e) {
                     logger.info(String.format("Something unexpected happened on file %s", file.getName()));
                     e.printStackTrace();
+                } finally {
+                    if (currentStatement != null) {
+                        try {
+                            currentStatement.close();
+                        } catch (SQLException e) {
+                            // Do nothing here
+                        }
+                        currentStatement = null;
+                    }
+                    if (preparedStatement != null) {
+                        try {
+                            preparedStatement.close();
+                        } catch (SQLException e) {
+                            // Do nothing here
+                        }
+                        preparedStatement = null;
+                    }
                 }
             } else {
                 logger.info(String.format("File already migrated: %s", filename));
