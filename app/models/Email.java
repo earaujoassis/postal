@@ -15,19 +15,18 @@ public class Email {
     public final static String ENTITY_NAME = "email";
 
     public static class Attributes {
-        public final static String PUBLIC_ID = "publicId";
-        public final static String BUCKET_KEY = "bucketKey";
-        public final static String BUCKET_OBJECT = "bucketObject";
-        public final static String SENT_AT = "sentAt";
+        public final static String PUBLIC_ID = "public_id";
+        public final static String BUCKET_KEY = "bucket_key";
+        public final static String SENT_AT = "sent_at";
         public final static String SUBJECT = "subject";
-        public final static String FROM = "from";
-        public final static String FROM_PERSONAL = "fromPersonal";
-        public final static String TO = "to";
-        public final static String BCC = "bcc";
-        public final static String CC = "cc";
-        public final static String REPLY_TO = "replyTo";
-        public final static String BODY_PLAIN = "bodyPlain";
-        public final static String BODY_HTML = "bodyHTML";
+        public final static String FROM = "from_email";
+        public final static String FROM_PERSONAL = "from_personal";
+        public final static String TO = "to_email";
+        public final static String BCC = "bcc_email";
+        public final static String CC = "cc_email";
+        public final static String REPLY_TO = "reply_to";
+        public final static String BODY_PLAIN = "body_plain";
+        public final static String BODY_HTML = "body_html";
         public final static String METADATA = "metadata";
     }
 
@@ -124,7 +123,6 @@ public class Email {
 
     public final String publicId;
     public final String bucketKey;
-    public final String bucketObject;
     public final OffsetDateTime sentAt;
     public final String subject;
     public final String from;
@@ -138,7 +136,6 @@ public class Email {
     public final Metadata metadata;
 
     public Email(final String bucketKey,
-                 final String bucketObject,
                  final OffsetDateTime sentAt,
                  final String subject,
                  final String from,
@@ -150,7 +147,6 @@ public class Email {
                  final String bodyPlain,
                  final String bodyHTML) {
         this.bucketKey = bucketKey;
-        this.bucketObject = bucketObject;
         this.sentAt = sentAt;
         this.subject = subject;
         this.from = from;
@@ -171,7 +167,6 @@ public class Email {
 
         this.publicId = (String) email.get(Attributes.PUBLIC_ID);
         this.bucketKey = (String) email.get(Attributes.BUCKET_KEY);
-        this.bucketObject = (String) email.get(Attributes.BUCKET_OBJECT);
         this.sentAt = OffsetDateTime.parse((String) email.get(Attributes.SENT_AT));
         this.subject = (String) email.get(Attributes.SUBJECT);
         this.from = (String) email.get(Attributes.FROM);

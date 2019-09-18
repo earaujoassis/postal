@@ -1,4 +1,4 @@
-package services;
+package repositories;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,15 +18,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import utils.Environment;
+import services.AppConfig;
 
 @Singleton
-public class StoreService {
+public class RepositoryConnector {
 
-    private final static Logger logger = LoggerFactory.getLogger(StoreService.class);
+    private final static Logger logger = LoggerFactory.getLogger(RepositoryConnector.class);
     protected Connection conn;
 
     @Inject
-    public StoreService(AppConfig conf) {
+    public RepositoryConnector(AppConfig conf) {
         final String environment = Environment.currentEnvironment();
         final String hostname = conf.getValue("datastore.hostname");
         final String dbName = String.format("%s_%s", conf.getValue("datastore.name_prefix"), environment);
