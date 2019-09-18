@@ -122,7 +122,7 @@ public class EmailRepository extends AbstractEntityRepository {
 
     public boolean update(String id, Email.Metadata metadata) {
         ObjectMapper objectMapper = new ObjectMapper();
-        final String SQL = String.format("UPDATE %s SET %s = ? WHERE %s = ?",
+        final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ?",
             this.tableName, Email.Attributes.METADATA, Email.Attributes.PUBLIC_ID);
         String metadataJSONString;
         PreparedStatement pStmt;

@@ -1,9 +1,4 @@
 {
-  "aws.access_key": "",
-  "aws.bucket_name": "",
-  "aws.bucket_prefix": "user",
-  "aws.kms_key": "",
-  "aws.secret_access_key": "",
   "datastore.hostname": "localhost:5432",
   "datastore.name_prefix": "postal",
   "space.client_key": "",

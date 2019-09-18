@@ -65,7 +65,7 @@ public class UserRepository extends AbstractEntityRepository {
 
     public boolean update(String id, User.Metadata metadata) {
         ObjectMapper objectMapper = new ObjectMapper();
-        final String SQL = String.format("UPDATE %s SET %s = ? WHERE %s = ?",
+        final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ?",
             this.tableName, User.Attributes.METADATA, User.Attributes.EXTERNAL_ID);
         String metadataJSONString;
         PreparedStatement pStmt;
