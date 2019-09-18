@@ -39,7 +39,7 @@ public class ApiEmailController extends Controller {
         Email doc = this.emailRepository.getOne(id);
 
         if (doc == null) {
-            return ok(Json.toJson(null));
+            return ok(Json.parse("null"));
         }
 
         return ok(Json.toJson(new Email.Presentation(doc)));

@@ -7,6 +7,8 @@ import java.time.OffsetDateTime;
 import java.util.regex.Pattern;
 import javax.mail.Address;
 import org.jsoup.Jsoup;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 
 import utils.RandomStringGenerator;
 
@@ -85,22 +87,12 @@ public class Email {
 
     public static class Metadata {
 
-        public final static String METADATA_READ = "read";
-        public final static String METADATA_FOLDER = "folder";
-
         public final boolean read;
         public final String folder;
 
         public Metadata() {
             this.read = false;
             this.folder = null;
-        }
-
-        public Metadata(Object hash) {
-            Map<String, Object> metadata = (Map<String, Object>) hash;
-
-            this.read = ((Boolean) metadata.get(METADATA_READ)).booleanValue();
-            this.folder = (String) metadata.get(METADATA_FOLDER);
         }
 
     }
@@ -158,7 +150,7 @@ public class Email {
     public final String bodyHTML;
 
     @SqlField(name = Attributes.METADATA)
-    public final Metadata metadata;
+    public Metadata metadata;
 
     public Email(final String bucketKey,
                  final OffsetDateTime sentAt,
@@ -189,6 +181,7 @@ public class Email {
 
     public Email(Object hash) {
         Map<String, Object> email = (Map<String, Object>) hash;
+        Object metadata;
 
         this.publicId = (String) email.get(Attributes.PUBLIC_ID);
         this.bucketKey = (String) email.get(Attributes.BUCKET_KEY);
@@ -202,7 +195,18 @@ public class Email {
         this.replyTo = (String) email.get(Attributes.REPLY_TO);
         this.bodyPlain = (String) email.get(Attributes.BODY_PLAIN);
         this.bodyHTML = (String) email.get(Attributes.BODY_HTML);
-        this.metadata = new Metadata(email.get(Attributes.METADATA));
+
+        this.metadata = new Metadata();
+        metadata = email.get(Attributes.METADATA);
+        if (metadata != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                this.metadata = (Metadata) objectMapper.readValue(metadata.toString(), Metadata.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.metadata = new Metadata();
+            }
+        }
     }
 
     public Summary toSummary() {
