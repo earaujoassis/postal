@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.Email;
+import models.SqlField;
 import utils.StoreUtils;
 
 @Singleton
@@ -26,14 +27,10 @@ public class EmailRepository extends AbstractEntityRepository {
     @Inject
     public EmailRepository(RepositoryConnector store) {
         List<String> fieldsNames = new ArrayList<>();
-        Field[] fields = Email.Attributes.class.getDeclaredFields();
+        Field[] fields = Email.class.getDeclaredFields();
         for (Field field : fields) {
-            if (Modifier.isPublic(field.getModifiers())) {
-                try {
-                    fieldsNames.add((String) field.get(new Email.Attributes()));
-                } catch (IllegalAccessException e) {
-                    // Do nothing
-                }
+            if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
+                fieldsNames.add(StoreUtils.getSqlFieldKey(field));
             }
         }
 
@@ -95,14 +92,14 @@ public class EmailRepository extends AbstractEntityRepository {
         final String SQL = String.format("INSERT INTO %s(%s) VALUES(%s)",
             this.tableName, this.allFields, StoreUtils.questionMarksForFields(this.listOfFields));
         Field[] fields = Email.class.getDeclaredFields();
-        int size = fields.length;
+        int fieldsSize = fields.length;
         PreparedStatement pStmt;
 
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < fieldsSize; i++) {
                 Field field = fields[i];
-                if (Modifier.isPublic(field.getModifiers())) {
+                if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
                     try {
                         pStmt.setObject(i + 1, field.get(email));
                     } catch (IllegalAccessException e) {

@@ -2,6 +2,9 @@ package utils;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.lang.reflect.Field;
+
+import models.SqlField;
 
 public class StoreUtils {
 
@@ -14,6 +17,11 @@ public class StoreUtils {
         }
 
         return String.join(",", questionMarks);
+    }
+
+    public static String getSqlFieldKey(Field field) {
+        String value = field.getAnnotation(SqlField.class).name();
+        return value.isEmpty() ? field.getName() : value;
     }
 
 }
