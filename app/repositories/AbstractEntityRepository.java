@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.lang.reflect.Field;
+
+import models.SqlField;
 
 public abstract class AbstractEntityRepository {
 
@@ -24,6 +27,22 @@ public abstract class AbstractEntityRepository {
         }
 
         return target;
+    }
+
+    protected String questionMarksForFields() {
+        List<String> questionMarks = new ArrayList<>();
+        int size = this.listOfFields.size();
+
+        for (int i = 0; i < size; i++) {
+            questionMarks.add("?");
+        }
+
+        return String.join(",", questionMarks);
+    }
+
+    protected String getSqlFieldKey(Field field) {
+        String value = field.getAnnotation(SqlField.class).name();
+        return value.isEmpty() ? field.getName() : value;
     }
 
 }

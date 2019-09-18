@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.User;
 import models.SqlField;
-import utils.StoreUtils;
 
 @Singleton
 public class UserRepository extends AbstractEntityRepository {
@@ -30,7 +29,7 @@ public class UserRepository extends AbstractEntityRepository {
         Field[] fields = User.Attributes.class.getDeclaredFields();
         for (Field field : fields) {
             if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
-                fieldsNames.add(StoreUtils.getSqlFieldKey(field));
+                fieldsNames.add(this.getSqlFieldKey(field));
             }
         }
 

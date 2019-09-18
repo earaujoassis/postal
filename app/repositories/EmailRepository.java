@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.Email;
 import models.SqlField;
-import utils.StoreUtils;
 
 @Singleton
 public class EmailRepository extends AbstractEntityRepository {
@@ -30,7 +29,7 @@ public class EmailRepository extends AbstractEntityRepository {
         Field[] fields = Email.class.getDeclaredFields();
         for (Field field : fields) {
             if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
-                fieldsNames.add(StoreUtils.getSqlFieldKey(field));
+                fieldsNames.add(this.getSqlFieldKey(field));
             }
         }
 
@@ -90,7 +89,7 @@ public class EmailRepository extends AbstractEntityRepository {
 
     public boolean insert(Email email) {
         final String SQL = String.format("INSERT INTO %s(%s) VALUES(%s)",
-            this.tableName, this.allFields, StoreUtils.questionMarksForFields(this.listOfFields));
+            this.tableName, this.allFields, this.questionMarksForFields());
         Field[] fields = Email.class.getDeclaredFields();
         int fieldsSize = fields.length;
         PreparedStatement pStmt;
