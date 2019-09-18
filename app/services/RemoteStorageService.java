@@ -52,17 +52,17 @@ public class RemoteStorageService implements IMailer {
             return;
         }
 
-        Map<String, String> remoteSettings = user.metadata.getRemoteStorageSettings();
+        User.Metadata.RemoteStorage remoteSettings = user.metadata.remoteStorage;
 
-        credentials = new BasicAWSCredentials(remoteSettings.get("access_key"), remoteSettings.get("secret_access_key"));
+        credentials = new BasicAWSCredentials(remoteSettings.accessKey, remoteSettings.secretAccessKey);
         s3Encryption = AmazonS3EncryptionClientBuilder
             .standard()
             .withCredentials(new AWSStaticCredentialsProvider(credentials))
             .withRegion(Regions.US_EAST_1)
             .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.EncryptionOnly).withAwsKmsRegion(Region.getRegion(Regions.US_EAST_1)))
-            .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(remoteSettings.get("kms_key")))
+            .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(remoteSettings.kmsKey))
             .build();
-        bucket = s3Encryption.listObjectsV2(remoteSettings.get("bucket_name"), remoteSettings.get("bucket_prefix"));
+        bucket = s3Encryption.listObjectsV2(remoteSettings.bucketName, remoteSettings.bucketPrefix);
         objectSummaries = bucket.getObjectSummaries();
         objectSummaries.sort(new Comparator<S3ObjectSummary>() {
             @Override

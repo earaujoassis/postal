@@ -24,6 +24,7 @@ public abstract class AbstractEntityRepository {
             for (String attribute : this.listOfFields) {
                 hash.put(attribute, rs.getObject(attribute));
             }
+            target.add(hash);
         }
 
         return target;

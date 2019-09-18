@@ -42,27 +42,29 @@ public class EmailRepository extends AbstractEntityRepository {
         Map<String, Long> status = new HashMap<String, Long>();
         final String SQLTotal = String.format("SELECT count(*) FROM %s", this.tableName);
         final String SQLRead = String.format("SELECT count(*) FROM %s WHERE (%s->>'%s')::boolean is false",
-            this.tableName, Email.Attributes.METADATA, Email.Metadata.METADATA_READ);
+            this.tableName, Email.Attributes.METADATA, "read");
         PreparedStatement pStmt;
         ResultSet rs;
 
         try {
             pStmt = this.store.conn.prepareStatement(SQLTotal);
             rs = pStmt.executeQuery();
-            pStmt.close();
             rs.next();
             status.put("total", Long.valueOf(rs.getInt(1)));
+            pStmt.close();
         } catch (SQLException e) {
+            e.printStackTrace();
             status.put("total", Long.valueOf(0));
         }
 
         try {
             pStmt = this.store.conn.prepareStatement(SQLRead);
             rs = pStmt.executeQuery();
-            pStmt.close();
             rs.next();
             status.put("unread", Long.valueOf(rs.getInt(1)));
+            pStmt.close();
         } catch (SQLException e) {
+            e.printStackTrace();
             status.put("unread", Long.valueOf(0));
         }
 
@@ -74,17 +76,20 @@ public class EmailRepository extends AbstractEntityRepository {
             this.tableName, Email.Attributes.BUCKET_KEY);
         PreparedStatement pStmt;
         ResultSet rs;
+        boolean emailAvailable = false;
 
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
             pStmt.setString(1, key);
             rs = pStmt.executeQuery();
-            pStmt.close();
             rs.next();
-            return rs.getInt(1) > 0;
+            emailAvailable = rs.getInt(1) > 0;
+            pStmt.close();
         } catch (SQLException e) {
-            return false;
+            e.printStackTrace();
         }
+
+        return emailAvailable;
     }
 
     public boolean insert(Email email) {
@@ -110,6 +115,7 @@ public class EmailRepository extends AbstractEntityRepository {
             pStmt.close();
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -124,6 +130,7 @@ public class EmailRepository extends AbstractEntityRepository {
         try {
             metadataJSONString = objectMapper.writeValueAsString(metadata);
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             metadataJSONString = "";
         }
 
@@ -135,12 +142,13 @@ public class EmailRepository extends AbstractEntityRepository {
             pStmt.close();
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
 
     public Iterable<Email> getAll(String folder) {
-        final String SQL = String.format("SELECT %s FROM %s LIMIT 10 ORDER BY %s DESC",
+        final String SQL = String.format("SELECT %s FROM %s ORDER BY %s DESC LIMIT(10)",
             this.allFields, this.tableName, Email.Attributes.SENT_AT);
         List<Email> target = new ArrayList<>();
         List<Map<String, Object>> results;
@@ -150,9 +158,10 @@ public class EmailRepository extends AbstractEntityRepository {
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
             rs = pStmt.executeQuery();
-            pStmt.close();
             results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
         } catch (SQLException e) {
+            e.printStackTrace();
             return target;
         }
 
@@ -174,9 +183,10 @@ public class EmailRepository extends AbstractEntityRepository {
             pStmt = this.store.conn.prepareStatement(SQL);
             pStmt.setString(1, id);
             rs = pStmt.executeQuery();
-            pStmt.close();
             results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
         } catch (SQLException e) {
+            e.printStackTrace();
             return null;
         }
 

@@ -1,31 +1,49 @@
 package models;
 
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 
 public class User {
 
     public final static String ENTITY_NAME = "user";
 
     public static class Metadata {
-        public Metadata(Object json) {
+
+        /**
+         * RemoteStorage represents a S3 storage connection:
+         * @accessKey: Access key for the AWS S3 user
+         * @secretAccessKey: Secret key for the AWS S3 user
+         * @kmsKey: KMS key to decrypt S3 objects/messages
+         * @bucketName: the Bucket where the objects are stored
+         * @bucketPrefix: the Bucket prefix (generally, the user defined by SES)
+         */
+        public static class RemoteStorage {
+            public final String accessKey;
+            public final String secretAccessKey;
+            public final String kmsKey;
+            public final String bucketName;
+            public final String bucketPrefix;
+
+            public RemoteStorage() {
+                this.accessKey = null;
+                this.secretAccessKey = null;
+                this.kmsKey = null;
+                this.bucketName = null;
+                this.bucketPrefix = null;
+            }
+        }
+
+        public final RemoteStorage remoteStorage;
+
+        public Metadata() {
+            this.remoteStorage = null;
         }
 
         public boolean hasRemoteStorage() {
-            // TODO Implement it
-            return false;
+            return this.remoteStorage != null;
         }
 
-        /**
-         * It should return a hashmap with the following attributes:
-         *      access_key: <Access key for the AWS S3 user>
-         *      secret_access_key: <Secret key for the AWS S3 user>
-         *      kms_key: <KMS key to decrypt S3 objects/messages>
-         *      bucket_name: <the Bucket where the objects are stored>
-         *      bucket_prefix: <the Bucket prefix (generally, the user defined by SES)>
-         */
-        public Map<String, String> getRemoteStorageSettings() {
-            return null;
-        }
     }
 
     public static class Attributes {
@@ -41,21 +59,34 @@ public class User {
     public final String fullName;
 
     @SqlField(name = Attributes.METADATA)
-    public final Metadata metadata;
+    public Metadata metadata;
 
     public User(final String externalId,
                 final String fullName) {
         this.externalId = externalId;
         this.fullName = fullName;
-        this.metadata = new Metadata(null);
+        this.metadata = new Metadata();
     }
 
     public User(Object hash) {
         Map<String, Object> user = (Map<String, Object>) hash;
+        Object metadata;
 
         this.externalId = (String) user.get(Attributes.EXTERNAL_ID);
         this.fullName = (String) user.get(Attributes.FULL_NAME);
-        this.metadata = new Metadata(user.get(Attributes.METADATA));
+
+        metadata = user.get(Attributes.METADATA);
+        if (metadata != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                this.metadata = (Metadata) objectMapper.readValue(metadata.toString(), Metadata.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.metadata = new Metadata();
+            }
+        } else {
+            this.metadata = new Metadata();
+        }
     }
 
 }

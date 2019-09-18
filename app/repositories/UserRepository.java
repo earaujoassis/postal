@@ -26,7 +26,7 @@ public class UserRepository extends AbstractEntityRepository {
     @Inject
     public UserRepository(RepositoryConnector store) {
         List<String> fieldsNames = new ArrayList<>();
-        Field[] fields = User.Attributes.class.getDeclaredFields();
+        Field[] fields = User.class.getDeclaredFields();
         for (Field field : fields) {
             if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
                 fieldsNames.add(this.getSqlFieldKey(field));
@@ -49,9 +49,10 @@ public class UserRepository extends AbstractEntityRepository {
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
             rs = pStmt.executeQuery();
-            pStmt.close();
             results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
         } catch (SQLException e) {
+            e.printStackTrace();
             return target;
         }
 
@@ -60,6 +61,33 @@ public class UserRepository extends AbstractEntityRepository {
         }
 
         return target;
+    }
+
+    public boolean update(String id, User.Metadata metadata) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        final String SQL = String.format("UPDATE %s SET %s = ? WHERE %s = ?",
+            this.tableName, User.Attributes.METADATA, User.Attributes.EXTERNAL_ID);
+        String metadataJSONString;
+        PreparedStatement pStmt;
+
+        try {
+            metadataJSONString = objectMapper.writeValueAsString(metadata);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            metadataJSONString = "";
+        }
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setString(1, metadataJSONString);
+            pStmt.setString(2, id);
+            pStmt.executeQuery();
+            pStmt.close();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public User getOne(String id) {
@@ -73,9 +101,10 @@ public class UserRepository extends AbstractEntityRepository {
             pStmt = this.store.conn.prepareStatement(SQL);
             pStmt.setString(1, id);
             rs = pStmt.executeQuery();
-            pStmt.close();
             results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
         } catch (SQLException e) {
+            e.printStackTrace();
             return null;
         }
 
