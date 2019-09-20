@@ -4,8 +4,10 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.io.IOException;
 
+@JsonPropertyOrder(alphabetic=false)
 public class User {
 
     public final static String ENTITY_NAME = "user";
