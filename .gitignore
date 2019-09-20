@@ -21,3 +21,4 @@ vscode
 .gradle/
 .settings/
 .project
+package-lock.json
