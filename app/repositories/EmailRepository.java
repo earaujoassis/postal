@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.PGobject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -104,14 +106,36 @@ public class EmailRepository extends AbstractEntityRepository {
             for (int i = 0; i < fieldsSize; i++) {
                 Field field = fields[i];
                 if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
+                    Object entry = null;
+
                     try {
-                        pStmt.setObject(i + 1, field.get(email));
+                        entry = field.get(email);
                     } catch (IllegalAccessException e) {
-                        pStmt.setObject(i + 1, null);
+                        pStmt.setObject(i, null);
+                        continue;
+                    }
+
+                    try {
+                        pStmt.setObject(i, entry);
+                    } catch (PSQLException e) {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        PGobject jsonObject = new PGobject();
+                        String metadataJSONString;
+
+                        try {
+                            metadataJSONString = objectMapper.writeValueAsString(entry);
+                        } catch (JsonProcessingException exc) {
+                            e.printStackTrace();
+                            metadataJSONString = "null";
+                        }
+
+                        jsonObject.setType("json");
+                        jsonObject.setValue(metadataJSONString);
+                        pStmt.setObject(i, jsonObject);
                     }
                 }
             }
-            pStmt.executeQuery();
+            pStmt.execute();
             pStmt.close();
             return true;
         } catch (SQLException e) {
@@ -138,7 +162,7 @@ public class EmailRepository extends AbstractEntityRepository {
             pStmt = this.store.conn.prepareStatement(SQL);
             pStmt.setString(1, metadataJSONString);
             pStmt.setString(2, id);
-            pStmt.executeQuery();
+            pStmt.execute();
             pStmt.close();
             return true;
         } catch (SQLException e) {

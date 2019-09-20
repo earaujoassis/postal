@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS emails (
     uuid                VARCHAR(36) UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
     public_id           VARCHAR(64) UNIQUE NOT NULL,
     user_id             INTEGER REFERENCES users(id),
-    bucket_key          VARCHAR(40) UNIQUE NOT NULL,
+    bucket_key          VARCHAR(64) UNIQUE NOT NULL,
     sent_at             VARCHAR(25) NOT NULL,
     subject             TEXT NOT NULL,
     from_email          VARCHAR(255) NOT NULL,
