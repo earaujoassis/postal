@@ -10,6 +10,7 @@ import javax.mail.Address;
 import org.jsoup.Jsoup;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.io.IOException;
 
 import utils.RandomStringGenerator;
@@ -18,6 +19,7 @@ public class Email {
 
     public final static String ENTITY_NAME = "email";
 
+    @JsonPropertyOrder(alphabetic=false)
     public static class Summary {
 
         public final String publicId;
@@ -63,6 +65,7 @@ public class Email {
 
     }
 
+    @JsonPropertyOrder(alphabetic=false)
     public static class Presentation {
 
         public final String publicId;
