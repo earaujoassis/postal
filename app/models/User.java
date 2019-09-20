@@ -2,6 +2,8 @@ package models;
 
 import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.IOException;
 
 public class User {
@@ -47,22 +49,30 @@ public class User {
     }
 
     public static class Attributes {
+        public final static String ID = "id";
         public final static String EXTERNAL_ID = "external_id";
         public final static String FULL_NAME = "full_name";
         public final static String METADATA = "metadata";
     }
 
+    @JsonIgnore
+    @SqlField(name = Attributes.ID)
+    public final Integer _id;
+
+    @JsonProperty("id")
     @SqlField(name = Attributes.EXTERNAL_ID)
     public final String externalId;
 
     @SqlField(name = Attributes.FULL_NAME)
     public final String fullName;
 
+    @JsonIgnore
     @SqlField(name = Attributes.METADATA)
     public Metadata metadata;
 
     public User(final String externalId,
                 final String fullName) {
+        this._id = null;
         this.externalId = externalId;
         this.fullName = fullName;
         this.metadata = new Metadata();
@@ -72,6 +82,7 @@ public class User {
         Map<String, Object> user = (Map<String, Object>) hash;
         Object metadata;
 
+        this._id = Integer.valueOf(user.get(Attributes.ID).toString());
         this.externalId = (String) user.get(Attributes.EXTERNAL_ID);
         this.fullName = (String) user.get(Attributes.FULL_NAME);
 
@@ -87,6 +98,10 @@ public class User {
         } else {
             this.metadata = new Metadata();
         }
+    }
+
+    public final String toString() {
+        return String.format("User::%s", this.fullName);
     }
 
 }

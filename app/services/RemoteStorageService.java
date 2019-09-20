@@ -26,19 +26,16 @@ import com.amazonaws.services.s3.model.KMSEncryptionMaterialsProvider;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
-import services.AppConfig;
 import repositories.EmailRepository;
 import models.User;
 import models.Email;
 
 public class RemoteStorageService implements IMailer {
 
-    private AppConfig conf;
     private EmailRepository emailRepository;
 
     @Inject
-    public RemoteStorageService(AppConfig conf, EmailRepository emailRepository) {
-        this.conf = conf;
+    public RemoteStorageService(EmailRepository emailRepository) {
         this.emailRepository = emailRepository;
     }
 
@@ -74,7 +71,7 @@ public class RemoteStorageService implements IMailer {
         for (S3ObjectSummary objSummary : objectSummaries) {
             String messageKey = objSummary.getKey();
             if (!this.emailRepository.isEmailAvailable(messageKey)) {
-                String rawMessage = s3Encryption.getObjectAsString(conf.getValue("aws.bucket_name"), messageKey);
+                String rawMessage = s3Encryption.getObjectAsString(remoteSettings.bucketName, messageKey);
                 Session session = Session.getInstance(new Properties());
                 InputStream inputStream = new ByteArrayInputStream(rawMessage.getBytes());
                 MimeMessage message;
@@ -85,7 +82,9 @@ public class RemoteStorageService implements IMailer {
                     message = new MimeMessage(session, inputStream);
                     enrichedMessage = new MimeMessageParser(message);
                     enrichedMessage.parse();
-                    emailDocument = new Email(messageKey,
+                    emailDocument = new Email(
+                        user._id,
+                        messageKey,
                         message.getSentDate().toInstant().atOffset(ZoneOffset.UTC),
                         enrichedMessage.getSubject(),
                         enrichedMessage.getFrom(),

@@ -29,8 +29,8 @@ public class SyncMessagesTask {
 
     private void initialize() {
         actorSystem.scheduler().schedule(
-            Duration.create(2, TimeUnit.MINUTES),
-            Duration.create(30, TimeUnit.MINUTES),
+            Duration.create(1, TimeUnit.MINUTES),
+            Duration.create(5, TimeUnit.MINUTES),
             syncMessagesActor,
             new Request("sync"),
             executionContext,

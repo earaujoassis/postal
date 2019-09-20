@@ -3,11 +3,13 @@ package models;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-import java.time.OffsetDateTime;
 import java.util.regex.Pattern;
+import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
 import javax.mail.Address;
 import org.jsoup.Jsoup;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.IOException;
 
 import utils.RandomStringGenerator;
@@ -17,6 +19,7 @@ public class Email {
     public final static String ENTITY_NAME = "email";
 
     public static class Summary {
+
         public final String publicId;
         public final OffsetDateTime sentAt;
         public final String subject;
@@ -39,8 +42,12 @@ public class Email {
         }
 
         public String getExcerpt() {
-            Pattern urlPattern = Pattern.compile("((https?|ftp|http):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)", Pattern.CASE_INSENSITIVE);
-            Pattern garbagePattern = Pattern.compile("([-_=]{2,})", Pattern.CASE_INSENSITIVE);
+            Pattern urlPattern = Pattern.compile(
+                "((https?|ftp|http):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)",
+                Pattern.CASE_INSENSITIVE);
+            Pattern garbagePattern = Pattern.compile(
+                "([-_=]{2,})",
+                Pattern.CASE_INSENSITIVE);
             String excerpt;
 
             if (this.bodyHTML != null) {
@@ -53,17 +60,19 @@ public class Email {
 
             return "not available";
         }
+
     }
 
     public static class Presentation {
+
         public final String publicId;
         public final OffsetDateTime sentAt;
         public final String subject;
         public final String from;
         public final String fromPersonal;
-        public final List<String> to;
-        public final List<String> bcc;
-        public final List<String> cc;
+        public final String to;
+        public final String bcc;
+        public final String cc;
         public final String replyTo;
         public final String bodyPlain;
         public final String bodyHTML;
@@ -83,6 +92,7 @@ public class Email {
             this.bodyHTML = source.bodyHTML;
             this.metadata = source.metadata;
         }
+
     }
 
     public static class Metadata {
@@ -99,6 +109,7 @@ public class Email {
 
     public static class Attributes {
         public final static String PUBLIC_ID = "public_id";
+        public final static String USER_ID = "user_id";
         public final static String BUCKET_KEY = "bucket_key";
         public final static String SENT_AT = "sent_at";
         public final static String SUBJECT = "subject";
@@ -116,6 +127,10 @@ public class Email {
     @SqlField(name = Attributes.PUBLIC_ID)
     public final String publicId;
 
+    @JsonIgnore
+    @SqlField(name = Attributes.USER_ID)
+    public final Integer userId;
+
     @SqlField(name = Attributes.BUCKET_KEY)
     public final String bucketKey;
 
@@ -132,13 +147,13 @@ public class Email {
     public final String fromPersonal;
 
     @SqlField(name = Attributes.TO)
-    public final List<String> to;
+    public final String to;
 
     @SqlField(name = Attributes.BCC)
-    public final List<String> bcc;
+    public final String bcc;
 
     @SqlField(name = Attributes.CC)
-    public final List<String> cc;
+    public final String cc;
 
     @SqlField(name = Attributes.REPLY_TO)
     public final String replyTo;
@@ -152,17 +167,19 @@ public class Email {
     @SqlField(name = Attributes.METADATA)
     public Metadata metadata;
 
-    public Email(final String bucketKey,
+    public Email(final Integer userId,
+                 final String bucketKey,
                  final OffsetDateTime sentAt,
                  final String subject,
                  final String from,
                  final String fromPersonal,
-                 final List<String> to,
-                 final List<String> bcc,
-                 final List<String> cc,
+                 final String to,
+                 final String bcc,
+                 final String cc,
                  final String replyTo,
                  final String bodyPlain,
                  final String bodyHTML) {
+        this.userId = userId;
         this.bucketKey = bucketKey;
         this.sentAt = sentAt;
         this.subject = subject;
@@ -184,14 +201,17 @@ public class Email {
         Object metadata;
 
         this.publicId = (String) email.get(Attributes.PUBLIC_ID);
+        this.userId = Integer.valueOf(email.get(Attributes.USER_ID).toString());
         this.bucketKey = (String) email.get(Attributes.BUCKET_KEY);
-        this.sentAt = OffsetDateTime.parse((String) email.get(Attributes.SENT_AT));
+        this.sentAt = OffsetDateTime.parse(
+            email.get(Attributes.SENT_AT).toString(),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssX"));
         this.subject = (String) email.get(Attributes.SUBJECT);
         this.from = (String) email.get(Attributes.FROM);
         this.fromPersonal = (String) email.get(Attributes.FROM_PERSONAL);
-        this.to = (List<String>) email.get(Attributes.TO);
-        this.bcc = (List<String>) email.get(Attributes.BCC);
-        this.cc = (List<String>) email.get(Attributes.CC);
+        this.to = (String) email.get(Attributes.TO);
+        this.bcc = (String) email.get(Attributes.BCC);
+        this.cc = (String) email.get(Attributes.CC);
         this.replyTo = (String) email.get(Attributes.REPLY_TO);
         this.bodyPlain = (String) email.get(Attributes.BODY_PLAIN);
         this.bodyHTML = (String) email.get(Attributes.BODY_HTML);
@@ -217,12 +237,12 @@ public class Email {
         return new Presentation(this);
     }
 
-    public static List<String> parseAddressList(List<Address> addresses) {
+    public static String parseAddressList(List<Address> addresses) {
         List<String> newList = new ArrayList<String>();
         for (Address address : addresses) {
             newList.add(address.toString());
         }
-        return newList;
+        return String.join(", ", newList);
     }
 
 }
