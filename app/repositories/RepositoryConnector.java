@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jdbcdslog.ConnectionLoggingProxy;
 
 import utils.Environment;
 import services.AppConfig;
@@ -37,7 +38,7 @@ public class RepositoryConnector {
 
         try {
             Class.forName("org.postgresql.Driver");
-            this.conn = DriverManager.getConnection(url);
+            this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url));
             logger.info(String.format("Connected to data store at %s", url));
             this.syncMigrations();
         } catch (SQLException e) {

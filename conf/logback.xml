@@ -33,6 +33,8 @@
   <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
   <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
 
+  <logger name="org.jdbcdslog.StatementLogger"  level="INFO" />
+
   <logger name="actors.SyncMessagesActor" level="INFO" />
   <logger name="services.AppConfig" level="INFO" />
   <logger name="repositories.RepositoryConnector" level="INFO" />
