@@ -44,7 +44,6 @@ public class AppConfig {
         this.secrets = vault.logical()
             .read(conf.getString("postal.configuration_store.path"))
             .getData();
-
         logger.info("Connection successful; configuration loaded");
     }
 

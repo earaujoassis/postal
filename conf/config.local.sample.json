@@ -1,6 +1,7 @@
 {
-  "datastore.hostname": "localhost:5432",
+  "datastore.hostname": "postal-postgres:5432",
   "datastore.name_prefix": "postal",
+  "datastore.credentials": "postal:8Gy1Bvh5r3raqTRi",
   "space.client_key": "",
   "space.client_secret": ""
 }
