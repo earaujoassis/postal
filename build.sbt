@@ -1,5 +1,6 @@
 name := """postal"""
 organization := "com.quatrolabs"
+maintainer := "carlos@quatrolabs.com"
 
 version := "0.1.2"
 

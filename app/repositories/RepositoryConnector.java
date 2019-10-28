@@ -38,10 +38,18 @@ public class RepositoryConnector {
 
         try {
             Class.forName("org.postgresql.Driver");
-            this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url));
+            if (environment.equals("production")) {
+                logger.info("Production environment, providing credentials for datastore");
+                String[] credentialsParts = conf.getValue("datastore.credentials").split(":");
+                this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url,
+                    credentialsParts[0], credentialsParts[1]));
+            } else {
+                this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url));
+            }
             logger.info(String.format("Connected to data store at %s", url));
             this.syncMigrations();
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.info(String.format("Connection to datastore at %s failed", url));
         } catch (ClassNotFoundException e) {
             logger.info("org.postgresql.Driver not found");
