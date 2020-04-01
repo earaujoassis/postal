@@ -387,6 +387,15 @@ iframe {
 
 /* ======== Generics */
 
+/*
+ * Color palette for the landing page (darker to lighter)
+ * #06192A
+ * #222F37
+ * #20354A
+ * #2A445D
+ * #81929C
+ */
+
 .entries,
 .replies,
 .actions,
@@ -405,4 +414,81 @@ iframe {
 
 .italic {
   font-style: italic;
+}
+
+/* ======== Landing */
+
+.top-header {
+  background-color: #06192A;
+  color: #fff;
+}
+
+.top-of-all {
+  display: flex;
+  flex-direction: row;
+  padding: 168px 0;
+  max-width: 66%;
+  margin: 0 auto;
+
+  .landing-branding {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+  }
+
+  .landing-presentation {
+    display: flex;
+    flex: 3;
+    align-items: flex-end;
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 1.7rem;
+  }
+}
+
+.branding-square {
+  display: flex;
+  align-items: flex-end;
+  border: 3px solid #fff;
+  padding: 12px;
+  width: 152px;
+  height: 152px;
+  transform: rotate(11.32624deg);
+  font-size: 1rem;
+}
+
+.landing-menu {
+  padding: 24px 0;
+  background-color: #2A445D;
+  color: #fff;
+  font-family: 'Didact Gothic', sans-serif;
+  font-size: 1rem;
+
+  .landing-menu-list {
+    list-style: none;
+    max-width: 66%;
+    margin: 0 auto;
+    text-align: center;
+
+    > li {
+      display: inline-block;
+    }
+  }
+}
+
+.landing-footer {
+  padding: 120px 0 30px;
+  max-width: 66%;
+  margin: 0 auto;
+  font-family: 'Didact Gothic', sans-serif;
+  font-size: 1rem;
+  text-align: right;
+  color: #81929C;
+
+  a {
+    color: #06192A;
+
+    &:hover {
+      color: #81929C;
+    }
+  }
 }

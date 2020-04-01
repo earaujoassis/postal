@@ -38,6 +38,7 @@
   <logger name="actors.SyncMessagesActor" level="INFO" />
   <logger name="services.AppConfig" level="INFO" />
   <logger name="repositories.RepositoryConnector" level="INFO" />
+  <logger name="utils.HttpHelper" level="INFO" />
 
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />

@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.io.IOException;
 
-import utils.RandomStringGenerator;
+import utils.StringUtils;
 
 public class Email {
 
@@ -195,7 +195,7 @@ public class Email {
         this.bodyPlain = bodyPlain;
         this.bodyHTML = bodyHTML;
 
-        this.publicId = RandomStringGenerator.generate(64);
+        this.publicId = StringUtils.generateRandomString(64);
         this.metadata = new Metadata();
     }
 

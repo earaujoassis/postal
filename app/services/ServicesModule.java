@@ -9,6 +9,7 @@ public class ServicesModule extends AbstractModule {
     protected void configure() {
         bind(AppConfig.class).asEagerSingleton();
         bind(RemoteStorageService.class).asEagerSingleton();
+        bind(OAuthService.class).asEagerSingleton();
     }
 
 }
