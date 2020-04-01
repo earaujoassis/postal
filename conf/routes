@@ -3,6 +3,9 @@
 # ~~~~
 
 GET     /                           controllers.HomeController.index
+GET     /signin                     controllers.HomeController.signin
+GET     /signup                     controllers.HomeController.signup
+GET     /callback                   controllers.HomeController.callback(code: String ?=null, scope: String ?=null, state: String ?=null)
 
 GET     /api/emails/status          controllers.ApiEmailController.status
 GET     /api/emails                 controllers.ApiEmailController.list(folder: String ?=null)
