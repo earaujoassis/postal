@@ -36,7 +36,7 @@ public class ApiEmailController extends Controller {
     }
 
     public Result show(String id) {
-        Email doc = this.emailRepository.getOne(id);
+        Email doc = this.emailRepository.getByPublicId(id);
 
         if (doc == null) {
             return ok(Json.parse("null"));

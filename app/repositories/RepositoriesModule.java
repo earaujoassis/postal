@@ -9,6 +9,7 @@ public class RepositoriesModule extends AbstractModule {
     protected void configure() {
         bind(RepositoryConnector.class).asEagerSingleton();
         bind(UserRepository.class).asEagerSingleton();
+        bind(UserSessionRepository.class).asEagerSingleton();
         bind(EmailRepository.class).asEagerSingleton();
     }
 

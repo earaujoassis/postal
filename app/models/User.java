@@ -58,8 +58,8 @@ public class User {
     }
 
     @JsonIgnore
-    @SqlField(name = Attributes.ID)
-    public final Integer _id;
+    @SqlField(name = Attributes.ID, settable = false)
+    public Integer _id;
 
     @JsonProperty("id")
     @SqlField(name = Attributes.EXTERNAL_ID)

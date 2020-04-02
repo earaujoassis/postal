@@ -10,5 +10,6 @@ import java.lang.annotation.Target;
 public @interface SqlField {
 
     public String name() default "";
+    public boolean settable() default true;
 
 }
