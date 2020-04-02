@@ -13,4 +13,5 @@ public class SyncMessagesActorProtocol {
             return this.command == "sync";
         }
     }
+
 }

@@ -1,6 +1,5 @@
 .DS_Store
 bin/
-/db
 .eclipse
 /lib/
 /logs/
@@ -15,9 +14,11 @@ server.pid
 /dist/
 .cache
 conf/secrets.conf
+conf/config.local.json
 public/javascripts/build.js
 node_modules/
 vscode
 .gradle/
 .settings/
 .project
+package-lock.json

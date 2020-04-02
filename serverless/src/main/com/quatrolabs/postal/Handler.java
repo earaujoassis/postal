@@ -1,4 +1,4 @@
-package com.carlosassis.postal;
+package com.quatrolabs.postal;
 
 import java.util.Date;
 import java.util.HashMap;

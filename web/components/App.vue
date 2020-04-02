@@ -15,7 +15,7 @@
         </ul>
       </div>
       <footer class="footer">
-        <p><a href="//quatrolabs.com" target="_blank">quatroLABS</a> &copy; 2019</p>
+        <p><a href="//quatrolabs.com" target="_blank">quatroLABS</a> &copy; 2016-present</p>
       </footer>
     </div>
     <div class="listing">

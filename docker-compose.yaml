@@ -1,13 +1,41 @@
-version: '3.4'
+version: '3.5'
+
+networks:
+  postal-network:
+    name: postal-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.177.59.0/24
+
 services:
-  postal-mongo:
-    image: 'mongo:3.6.10'
-    container_name: postal-mongo
-    hostname: postal-mongo
-    ports:
-        - "27017:27017"
+  postal-postgres:
+    image: 'postgres:9.6.10'
+    container_name: postal-postgres
+    hostname: postal-postgres
+    expose:
+      - "5432"
+    restart: always
     volumes:
-      - postal-mongo-data:/data/db
+      - postal-postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postal
+      POSTGRES_PASSWORD: 8Gy1Bvh5r3raqTRi
+      POSTGRES_DB: postal_production
+    networks:
+      - postal-network
+
+  postal:
+    build:
+      context: .
+    container_name: postal
+    image: postal
+    ports:
+      - "8585:9000"
+    environment:
+      POSTAL_SECRET: ovNlZw6S4tf0ryDbJoPKfYhg3MKsJexS
+    networks:
+      - postal-network
 
 volumes:
-  postal-mongo-data:
+  postal-postgres-data:

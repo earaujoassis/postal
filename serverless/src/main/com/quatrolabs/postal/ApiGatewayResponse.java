@@ -1,4 +1,4 @@
-package com.carlosassis.postal;
+package com.quatrolabs.postal;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
