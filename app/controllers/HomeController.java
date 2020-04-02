@@ -5,7 +5,6 @@ import play.api.inject.Injector;
 import play.mvc.*;
 import play.libs.Json;
 import play.mvc.Http.Cookie;
-import play.api.mvc.DiscardingCookie;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import services.AppConfig;
@@ -50,6 +49,19 @@ public class HomeController extends Controller {
 
     public Result signup() {
         return redirect(authService.getBaseUrl());
+    }
+
+    public Result signout() {
+        JWTService jwtService = this.injector.instanceOf(JWTService.class);
+        UserSessionRepository userSessionRepository = this.injector.instanceOf(UserSessionRepository.class);
+        String sessionStr = request().cookie("postal.session").value();
+
+        UserSession session = userSessionRepository.getById(Integer.valueOf(jwtService.getSessionId(sessionStr)));
+        if (session != null && !session.invalidated) {
+            userSessionRepository.invalidate(session._id);
+        }
+
+        return redirect("/").discardingCookie("postal.session");
     }
 
     public Result callback(String code, String scope, String state) {

@@ -20,6 +20,7 @@ public class UserSession {
         public final static String REFRESH_TOKEN = "refresh_token";
         public final static String SCOPE = "scope";
         public final static String TOKEN_TYPE = "token_type";
+        public final static String INVALIDATED = "invalidated";
     }
 
     @JsonIgnore
@@ -50,6 +51,10 @@ public class UserSession {
     @SqlField(name = Attributes.TOKEN_TYPE)
     public final String tokenType;
 
+    @JsonIgnore
+    @SqlField(name = Attributes.INVALIDATED)
+    public final boolean invalidated;
+
     public UserSession(final Integer userId,
                        final String accessToken,
                        final Integer expiresIn,
@@ -63,6 +68,7 @@ public class UserSession {
         this.refreshToken = refreshToken;
         this.scope = scope;
         this.tokenType = tokenType;
+        this.invalidated = false;
     }
 
     public UserSession(Object hash) {
@@ -76,6 +82,7 @@ public class UserSession {
         this.refreshToken = (String) userSession.get(Attributes.REFRESH_TOKEN);
         this.scope = (String) userSession.get(Attributes.SCOPE);
         this.tokenType = (String) userSession.get(Attributes.TOKEN_TYPE);
+        this.invalidated = ((Boolean) userSession.get(Attributes.INVALIDATED)).booleanValue();
     }
 
     public final String toString() {
