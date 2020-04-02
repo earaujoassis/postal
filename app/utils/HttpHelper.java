@@ -19,9 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpHelper {
+
     private final static Logger logger = LoggerFactory.getLogger(HttpHelper.class);
 
-    public static String doPost(String _url, Map<String, String> header, Map<String, String> formData) {
+    public static String doPost(String _url, Map<String, String> header, Map<String, String> formData)
+    throws HttpHelperException {
         StringBuffer content = new StringBuffer();
         byte[] output;
         int outputLength;
@@ -91,7 +93,8 @@ public class HttpHelper {
         return content.toString();
     }
 
-    private static byte[] urlEncodedForm(Map<String, String> arguments) throws UnsupportedEncodingException {
+    private static byte[] urlEncodedForm(Map<String, String> arguments)
+    throws UnsupportedEncodingException {
         StringJoiner sj = new StringJoiner("&");
 
         for (Map.Entry<String,String> entry : arguments.entrySet()) {
@@ -100,4 +103,5 @@ public class HttpHelper {
 
         return sj.toString().getBytes(StandardCharsets.UTF_8);
     }
+
 }

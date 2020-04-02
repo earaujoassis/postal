@@ -23,7 +23,8 @@ public class AppConfig {
     private final Map<String, String> secrets;
 
     @Inject
-    public AppConfig(Config conf) throws VaultException, IOException {
+    public AppConfig(Config conf)
+    throws VaultException, IOException {
         logger.info("Checking if local configuration exists");
         File localConfigFile = new File("conf/config.local.json");
 

@@ -18,7 +18,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.Email;
-import models.SqlField;
 
 @Singleton
 public class EmailRepository extends AbstractEntityRepository {
@@ -27,17 +26,137 @@ public class EmailRepository extends AbstractEntityRepository {
 
     @Inject
     public EmailRepository(RepositoryConnector store) {
-        List<String> fieldsNames = new ArrayList<>();
-        Field[] fields = Email.class.getDeclaredFields();
-        for (Field field : fields) {
-            if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
-                fieldsNames.add(this.getSqlFieldKey(field));
-            }
-        }
-
+        List<String> fieldsNames = this.getFieldsNames(Email.class);
         this.listOfFields = fieldsNames;
         this.allFields = String.join(",", fieldsNames);
         this.store = store;
+    }
+
+    public Iterable<Email> getAll(String folder) {
+        final String SQL = String.format("SELECT %s FROM %s ORDER BY %s DESC LIMIT(10)",
+            this.allFields, this.tableName, Email.Attributes.SENT_AT);
+        List<Email> target = new ArrayList<>();
+        List<Map<String, Object>> results;
+        PreparedStatement pStmt;
+        ResultSet rs;
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            rs = pStmt.executeQuery();
+            results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return target;
+        }
+
+        for (Map<String, Object> hash : results) {
+            target.add(new Email(hash));
+        }
+
+        return target;
+    }
+
+    public Email getByPublicId(String id) {
+        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ?",
+            this.allFields, this.tableName, Email.Attributes.PUBLIC_ID);
+        List<Map<String, Object>> results;
+        PreparedStatement pStmt;
+        ResultSet rs;
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setString(1, id);
+            rs = pStmt.executeQuery();
+            results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        if (results.size() > 0) {
+            return new Email(results.get(0));
+        }
+
+        return null;
+    }
+
+    public boolean insert(Email email) {
+        final List<String> fieldsNames = this.getSettableFieldsNames(Email.class);
+        final String allFields = String.join(",", fieldsNames);
+        final String SQL = String.format("INSERT INTO %s(%s) VALUES(%s)",
+            this.tableName, allFields, this.questionMarksForFields(fieldsNames.size()));
+        List<Field> fields = this.getSettableFields(Email.class);
+        int fieldsSize = fields.size();
+        PreparedStatement pStmt;
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            for (int i = 1; i < fieldsSize + 1; i++) {
+                Field field = fields.get(i - 1);
+                Object entry = null;
+
+                try {
+                    entry = field.get(email);
+                } catch (IllegalAccessException e) {
+                    pStmt.setObject(i, null);
+                    continue;
+                }
+
+                try {
+                    pStmt.setObject(i, entry);
+                } catch (PSQLException e) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    PGobject jsonObject = new PGobject();
+                    String metadataJSONString;
+
+                    try {
+                        metadataJSONString = objectMapper.writeValueAsString(entry);
+                    } catch (JsonProcessingException exc) {
+                        e.printStackTrace();
+                        metadataJSONString = "null";
+                    }
+
+                    jsonObject.setType("json");
+                    jsonObject.setValue(metadataJSONString);
+                    pStmt.setObject(i, jsonObject);
+                }
+            }
+            pStmt.execute();
+            pStmt.close();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean update(String id, Email.Metadata metadata) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ?",
+            this.tableName, Email.Attributes.METADATA, Email.Attributes.PUBLIC_ID);
+        String metadataJSONString;
+        PreparedStatement pStmt;
+
+        try {
+            metadataJSONString = objectMapper.writeValueAsString(metadata);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            metadataJSONString = "";
+        }
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setString(1, metadataJSONString);
+            pStmt.setString(2, id);
+            pStmt.execute();
+            pStmt.close();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public Map<String, Long> status() {
@@ -92,133 +211,6 @@ public class EmailRepository extends AbstractEntityRepository {
         }
 
         return emailAvailable;
-    }
-
-    public boolean insert(Email email) {
-        final String SQL = String.format("INSERT INTO %s(%s) VALUES(%s)",
-            this.tableName, this.allFields, this.questionMarksForFields());
-        Field[] fields = Email.class.getDeclaredFields();
-        int fieldsSize = fields.length;
-        PreparedStatement pStmt;
-
-        try {
-            pStmt = this.store.conn.prepareStatement(SQL);
-            for (int i = 0; i < fieldsSize; i++) {
-                Field field = fields[i];
-                if (Modifier.isPublic(field.getModifiers()) && field.isAnnotationPresent(SqlField.class)) {
-                    Object entry = null;
-
-                    try {
-                        entry = field.get(email);
-                    } catch (IllegalAccessException e) {
-                        pStmt.setObject(i, null);
-                        continue;
-                    }
-
-                    try {
-                        pStmt.setObject(i, entry);
-                    } catch (PSQLException e) {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        PGobject jsonObject = new PGobject();
-                        String metadataJSONString;
-
-                        try {
-                            metadataJSONString = objectMapper.writeValueAsString(entry);
-                        } catch (JsonProcessingException exc) {
-                            e.printStackTrace();
-                            metadataJSONString = "null";
-                        }
-
-                        jsonObject.setType("json");
-                        jsonObject.setValue(metadataJSONString);
-                        pStmt.setObject(i, jsonObject);
-                    }
-                }
-            }
-            pStmt.execute();
-            pStmt.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean update(String id, Email.Metadata metadata) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ?",
-            this.tableName, Email.Attributes.METADATA, Email.Attributes.PUBLIC_ID);
-        String metadataJSONString;
-        PreparedStatement pStmt;
-
-        try {
-            metadataJSONString = objectMapper.writeValueAsString(metadata);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            metadataJSONString = "";
-        }
-
-        try {
-            pStmt = this.store.conn.prepareStatement(SQL);
-            pStmt.setString(1, metadataJSONString);
-            pStmt.setString(2, id);
-            pStmt.execute();
-            pStmt.close();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public Iterable<Email> getAll(String folder) {
-        final String SQL = String.format("SELECT %s FROM %s ORDER BY %s DESC LIMIT(10)",
-            this.allFields, this.tableName, Email.Attributes.SENT_AT);
-        List<Email> target = new ArrayList<>();
-        List<Map<String, Object>> results;
-        PreparedStatement pStmt;
-        ResultSet rs;
-
-        try {
-            pStmt = this.store.conn.prepareStatement(SQL);
-            rs = pStmt.executeQuery();
-            results = this.fromResultSetToListOfHashes(rs);
-            pStmt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return target;
-        }
-
-        for (Map<String, Object> hash : results) {
-            target.add(new Email(hash));
-        }
-
-        return target;
-    }
-
-    public Email getOne(String id) {
-        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ?",
-            this.allFields, this.tableName, Email.Attributes.PUBLIC_ID);
-        List<Map<String, Object>> results;
-        PreparedStatement pStmt;
-        ResultSet rs;
-
-        try {
-            pStmt = this.store.conn.prepareStatement(SQL);
-            pStmt.setString(1, id);
-            rs = pStmt.executeQuery();
-            results = this.fromResultSetToListOfHashes(rs);
-            pStmt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        if (results.size() > 0) {
-            return new Email(results.get(0));
-        }
-
-        return null;
     }
 
 }

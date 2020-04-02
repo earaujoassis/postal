@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import java.util.Base64;
 import java.util.Map;
 import java.util.HashMap;
+
 import utils.StringUtils;
 import utils.HttpHelper;
 import utils.HttpHelperException;
@@ -19,7 +20,7 @@ public class OAuthService {
     private String clientAuthorizationToken;
     private String baseUrl;
     private String authorizeUrl;
-    private final String scope = "public";
+    private final String scope = "read";
 
     @Inject
     public OAuthService(AppConfig conf) {
@@ -41,13 +42,75 @@ public class OAuthService {
         return this.baseUrl;
     }
 
-    public String retrieveAccessToken(String code) throws OAuthServiceException {
+    public String retrieveAccessToken(String code)
+    throws OAuthServiceException {
         String url = String.format("%s/token", this.baseUrl);
         Map<String, String> header = this.commonHeader();
-        Map<String, String> formData = this.retrieveAccessTokenFormData(code);
+        Map<String, String> formData = Map.of(
+            "grant_type", "authorization_code",
+            "code", code,
+            "redirect_uri", this.redirectUri
+        );
         String content;
 
         try {
+            content = HttpHelper.doPost(url, header, formData);
+        } catch (HttpHelperException err) {
+            throw new OAuthServiceException(err.getMessage());
+        }
+
+        return content;
+    }
+
+    public String refreshAccessToken(String refreshToken)
+    throws OAuthServiceException {
+        String url = String.format("%s/token", this.baseUrl);
+        Map<String, String> header = this.commonHeader();
+        Map<String, String> formData = Map.of(
+            "grant_type", "refresh_token",
+            "refresh_token", refreshToken,
+            "scope", this.scope
+        );
+        String content;
+
+        try {
+            content = HttpHelper.doPost(url, header, formData);
+        } catch (HttpHelperException err) {
+            throw new OAuthServiceException(err.getMessage());
+        }
+
+        return content;
+    }
+
+    public String getTokenState(String token)
+    throws OAuthServiceException {
+        String url = String.format("%s/api/sessions/introspect", this.baseUrl);
+        Map<String, String> header = this.commonHeader();
+        Map<String, String> formData = Map.of(
+            "access_token", token
+        );
+        String content;
+
+        try {
+            content = HttpHelper.doPost(url, header, formData);
+        } catch (HttpHelperException err) {
+            throw new OAuthServiceException(err.getMessage());
+        }
+
+        return content;
+    }
+
+    public String getUserData(String token, String externalUserId)
+    throws OAuthServiceException {
+        String url = String.format("%s/api/users/introspect", this.baseUrl);
+        Map<String, String> header = this.commonHeader();
+        Map<String, String> formData = Map.of(
+            "user_id", externalUserId
+        );
+        String content;
+
+        try {
+            header.put("Authorization", String.format("Bearer %s", token));
             content = HttpHelper.doPost(url, header, formData);
         } catch (HttpHelperException err) {
             throw new OAuthServiceException(err.getMessage());
@@ -64,16 +127,6 @@ public class OAuthService {
         header.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 
         return header;
-    }
-
-    private Map<String, String> retrieveAccessTokenFormData(String code) {
-        Map<String, String> arguments = new HashMap<>();
-
-        arguments.put("grant_type", "authorization_code");
-        arguments.put("code", code);
-        arguments.put("redirect_uri", this.redirectUri);
-
-        return arguments;
     }
 
 }

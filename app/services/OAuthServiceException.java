@@ -1,6 +1,7 @@
 package services;
 
 public class OAuthServiceException extends RuntimeException {
+
     public OAuthServiceException(String errorMessage) {
         super(errorMessage);
     }
@@ -8,4 +9,5 @@ public class OAuthServiceException extends RuntimeException {
     public String jsonMessage() {
         return String.format("{\"_status\": \"error\", \"_message\": \"%s\"}", this.getMessage());
     }
+
 }
