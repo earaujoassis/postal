@@ -47,7 +47,8 @@ public class RepositoryConnector {
                 this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url));
             }
             logger.info(String.format("Connected to data store at %s", url));
-            this.syncMigrations();
+            // LEGACY The call below was used to syncMigrations. There's now an actor for that (async)
+            // this.syncMigrations();
         } catch (SQLException e) {
             e.printStackTrace();
             logger.info(String.format("Connection to datastore at %s failed", url));
@@ -56,7 +57,7 @@ public class RepositoryConnector {
         }
     }
 
-    protected void syncMigrations() {
+    public void syncMigrations() {
         Statement currentStatement = null;
         PreparedStatement preparedStatement = null;
         final String migrationTable = ("CREATE TABLE IF NOT EXISTS migrations (\n" +
@@ -128,9 +129,33 @@ public class RepositoryConnector {
                 } catch (SQLException e) {
                     logger.info(String.format("Something unexpected happened on file %s", file.getName()));
                     e.printStackTrace();
+                    try {
+                        this.conn.rollback();
+                    } catch (SQLException er) {
+                        logger.info("Error while reverting statement; aborting anyway");
+                        e.printStackTrace();
+                    }
+                    break;
                 } catch (IOException e) {
                     logger.info(String.format("Something unexpected happened on file %s", file.getName()));
                     e.printStackTrace();
+                    try {
+                        this.conn.rollback();
+                    } catch (SQLException er) {
+                        logger.info("Error while reverting statement; aborting anyway");
+                        e.printStackTrace();
+                    }
+                    break;
+                } catch (RuntimeException e) {
+                    logger.info(String.format("Something unexpected happened on file %s", file.getName()));
+                    e.printStackTrace();
+                    try {
+                        this.conn.rollback();
+                    } catch (SQLException er) {
+                        logger.info("Error while reverting statement; aborting anyway");
+                        e.printStackTrace();
+                    }
+                    break;
                 } finally {
                     if (currentStatement != null) {
                         try {
