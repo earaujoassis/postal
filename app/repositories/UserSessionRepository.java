@@ -113,4 +113,22 @@ public class UserSessionRepository extends AbstractEntityRepository {
         }
     }
 
+    public boolean invalidate(Integer id) {
+        final String SQL = String.format("UPDATE %s SET %s = ? WHERE %s = ?",
+            this.tableName, UserSession.Attributes.INVALIDATED, UserSession.Attributes.ID);
+        PreparedStatement pStmt;
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setBoolean(1, true);
+            pStmt.setInt(2, id);
+            pStmt.execute();
+            pStmt.close();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
