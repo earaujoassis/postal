@@ -1,5 +1,6 @@
 name := """postal"""
 organization := "com.quatrolabs"
+maintainer := "carlos@quatrolabs.com"
 
 version := "0.1.2"
 
@@ -18,7 +19,9 @@ libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.61"
 libraryDependencies += "org.apache.logging.log4j" % "log4j" % "2.11.2"
 libraryDependencies += "org.jsoup" % "jsoup" % "1.11.3"
 libraryDependencies += "com.bettercloud" % "vault-java-driver" % "4.0.0"
-libraryDependencies += "com.rethinkdb" % "rethinkdb-driver" % "2.3.3"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.2.8"
+libraryDependencies += "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2"
+libraryDependencies += "com.auth0" % "java-jwt" % "3.10.2"
 
 includeFilter in (Assets, LessKeys.less) := "*.less"
 excludeFilter in (Assets, LessKeys.less) := "_*.less"

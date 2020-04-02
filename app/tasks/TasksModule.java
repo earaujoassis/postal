@@ -7,6 +7,7 @@ public class TasksModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(SyncMessagesTask.class).asEagerSingleton();
+        bind(SyncMigrationsTask.class).asEagerSingleton();
     }
 
 }

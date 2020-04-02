@@ -1,11 +1,10 @@
 {
-  "aws.access_key": "",
-  "aws.bucket_name": "",
-  "aws.bucket_prefix": "user",
-  "aws.kms_key": "",
-  "aws.secret_access_key": "",
-  "datastore.hostname": "rethinkdb-host",
+  "datastore.hostname": "postal-postgres:5432",
   "datastore.name_prefix": "postal",
+  "datastore.credentials": "postal:8Gy1Bvh5r3raqTRi",
+  "space.base_url": "",
   "space.client_key": "",
-  "space.client_secret": ""
+  "space.client_secret": "",
+  "space.redirect_uri": "",
+  "jwt.secret": ""
 }
