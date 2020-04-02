@@ -1,6 +1,6 @@
 package actors;
 
-public class SyncMessagesActorProtocol {
+public class SyncMigrationsActorProtocol {
 
     public static class Request {
         public final String command;
