@@ -8,17 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.ArrayList;
 
+import actions.Authentication;
 import repositories.EmailRepository;
 import models.Email;
 
+@Authentication(enforce = true)
 public class ApiEmailController extends Controller {
 
-    private EmailRepository emailRepository;
-
-    @Inject
-    public ApiEmailController(EmailRepository emailRepository) {
-        this.emailRepository = emailRepository;
-    }
+    @Inject EmailRepository emailRepository;
 
     public Result status() {
         return ok(Json.toJson(this.emailRepository.status()));
