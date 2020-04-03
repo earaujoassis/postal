@@ -7,11 +7,11 @@ import play.libs.Json;
 import play.mvc.Http.Cookie;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import actions.Authentication;
 import services.AppConfig;
 import services.OAuthService;
 import services.OAuthServiceException;
 import services.JWTService;
-
 import repositories.UserRepository;
 import repositories.UserSessionRepository;
 import models.UserSession;
@@ -23,15 +23,8 @@ import models.User;
  */
 public class HomeController extends Controller {
 
-    private OAuthService authService;
-    private Injector injector;
-
-    @Inject
-    public HomeController(OAuthService authService,
-                          Injector injector) {
-        this.authService = authService;
-        this.injector = injector;
-    }
+    @Inject OAuthService authService;
+    @Inject Injector injector;
 
     /**
      * An action that renders an HTML page with a welcome message.
@@ -39,6 +32,7 @@ public class HomeController extends Controller {
      * this method will be called when the application receives a
      * <code>GET</code> request with a path of <code>/</code>.
      */
+    @Authentication(json = false)
     public Result index() {
         return ok(views.html.landing.render());
     }
@@ -51,6 +45,7 @@ public class HomeController extends Controller {
         return redirect(authService.getBaseUrl());
     }
 
+    @Authentication(json = false)
     public Result signout() {
         JWTService jwtService = this.injector.instanceOf(JWTService.class);
         UserSessionRepository userSessionRepository = this.injector.instanceOf(UserSessionRepository.class);

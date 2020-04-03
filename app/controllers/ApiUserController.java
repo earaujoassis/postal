@@ -6,20 +6,17 @@ import play.libs.Json;
 import java.util.List;
 import java.util.ArrayList;
 
+import actions.Authentication;
+import actions.AuthenticationAttrs;
 import repositories.UserRepository;
 import models.User;
 
+@Authentication(enforce = true)
 public class ApiUserController extends Controller {
 
-    private UserRepository userRepository;
-
-    @Inject
-    public ApiUserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public Result show(String id) {
-        return ok(Json.parse("null"));
+    public Result show() {
+        User user = request().attrs().get(AuthenticationAttrs.USER);
+        return ok(Json.toJson(user));
     }
 
 }
