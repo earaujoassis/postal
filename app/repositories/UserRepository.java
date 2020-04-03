@@ -55,6 +55,31 @@ public class UserRepository extends AbstractEntityRepository {
         return target;
     }
 
+    public User getById(Integer id) {
+        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ?",
+            this.allFields, this.tableName, User.Attributes.ID);
+        List<Map<String, Object>> results;
+        PreparedStatement pStmt;
+        ResultSet rs;
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setInt(1, id.intValue());
+            rs = pStmt.executeQuery();
+            results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        if (results.size() > 0) {
+            return new User(results.get(0));
+        }
+
+        return null;
+    }
+
     public User getByExternalId(String id) {
         final String SQL = String.format("SELECT %s FROM %s WHERE %s = ?",
             this.allFields, this.tableName, User.Attributes.EXTERNAL_ID);
