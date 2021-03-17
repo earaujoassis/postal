@@ -1,7 +1,7 @@
 import { ActionTree } from "vuex";
 
 import { EmailsState, EmailSummary, EmailFull } from "./types";
-import { RootState } from "../types";
+import { RootState } from "../../types";
 
 export const actions: ActionTree<EmailsState, RootState> = {
     fetchStatusData({ commit }): any {

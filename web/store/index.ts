@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
 import { RootState } from "./types";
-import { emails } from "./emails/index";
+import { emails } from "./modules/emails";
 
 Vue.use(Vuex);
 
