@@ -16,6 +16,7 @@ server.pid
 conf/secrets.conf
 conf/config.local.json
 public/javascripts/build.js
+public/javascripts/build.js.map
 node_modules/
 vscode
 .gradle/
