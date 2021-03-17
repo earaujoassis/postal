@@ -7,7 +7,9 @@
     "module": "es2015",
     "moduleResolution": "node",
     "target": "es5",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
   "exclude": [
     "node_modules"
@@ -19,5 +21,6 @@
     "@/*": [
       "./web/*"
     ]
-  }
+  },
+  "compileOnSave": false
 }

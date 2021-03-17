@@ -12,6 +12,7 @@
           <li><router-link class="sent" to="/sent">Sent</router-link></li>
           <li><router-link class="drafts" to="/drafts">Drafts</router-link></li>
           <li><router-link class="trash" to="/trash">Trash</router-link></li>
+          <li><a href="/signout">Sign-out</a></li>
         </ul>
       </div>
       <footer class="footer">
@@ -47,8 +48,9 @@
 </template>
 
 <script lang="ts">
-  import { Component, Watch, Vue } from "vue-property-decorator";
-  import { State, Action, Getter } from "vuex-class";
+  import Component from "vue-class-component";
+  import { Vue } from "vue-property-decorator";
+  import { State, Action } from "vuex-class";
 
   import { EmailsState } from "../emails/types";
 

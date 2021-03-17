@@ -58,8 +58,9 @@
 </template>
 
 <script lang="ts">
-  import { Component, Watch, Vue } from "vue-property-decorator";
-  import { State, Action, Getter } from "vuex-class";
+  import Component from "vue-class-component";
+  import { Vue, Watch } from "vue-property-decorator";
+  import { State, Action } from "vuex-class";
 
   import { EmailsState } from "../emails/types";
 
@@ -78,7 +79,7 @@
       }
 
       @Watch("$route")
-      onRouterChange(to: any, from: any) {
+      onRouterChange(to: any, _from: any) {
         this.fetchEmailData(to.params.id);
       }
 
