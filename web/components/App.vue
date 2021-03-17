@@ -12,6 +12,7 @@
           <li><router-link class="sent" to="/sent">Sent</router-link></li>
           <li><router-link class="drafts" to="/drafts">Drafts</router-link></li>
           <li><router-link class="trash" to="/trash">Trash</router-link></li>
+          <li><a href="/signout">Sign-out</a></li>
         </ul>
       </div>
       <footer class="footer">

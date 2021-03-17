@@ -14,6 +14,7 @@ import services.AppConfig;
 @Singleton
 public class OAuthService {
 
+    private String redirectUriRaw;
     private String redirectUri;
     private String clientKey;
     private String clientSecret;
@@ -24,12 +25,13 @@ public class OAuthService {
 
     @Inject
     public OAuthService(AppConfig conf) {
-        this.redirectUri = StringUtils.encodeUriComponent(conf.getValue("space.redirect_uri"));
+        this.redirectUriRaw = conf.getValue("space.redirect_uri");
+        this.redirectUri = StringUtils.encodeUriComponent(this.redirectUriRaw);
         this.clientKey = conf.getValue("space.client_key");
         this.clientSecret = conf.getValue("space.client_secret");
         this.clientAuthorizationToken = Base64.getEncoder().encodeToString(
             String.format("%s:%s", this.clientKey, this.clientSecret).getBytes());
-        this.baseUrl = conf.getValue("space.base_url");
+        this.baseUrl = StringUtils.trimTrailingSlashes(conf.getValue("space.base_url"));
         this.authorizeUrl = String.format("%s/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=",
             this.baseUrl, this.clientKey, this.redirectUri, this.scope);
     }
@@ -47,9 +49,9 @@ public class OAuthService {
         String url = String.format("%s/token", this.baseUrl);
         Map<String, String> header = this.commonHeader();
         Map<String, String> formData = Map.of(
+            "redirect_uri", this.redirectUriRaw,
             "grant_type", "authorization_code",
-            "code", code,
-            "redirect_uri", this.redirectUri
+            "code", code
         );
         String content;
 
