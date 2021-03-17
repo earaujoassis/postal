@@ -85,6 +85,10 @@ public class UserSession {
         this.invalidated = ((Boolean) userSession.get(Attributes.INVALIDATED)).booleanValue();
     }
 
+    public boolean stillValid() {
+        return !this.invalidated;
+    }
+
     public final String toString() {
         return String.format("UserSession::%s", this.accessToken);
     }

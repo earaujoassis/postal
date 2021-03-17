@@ -3,6 +3,7 @@ package repositories;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
+import java.util.Arrays;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;
@@ -83,6 +84,7 @@ public class RepositoryConnector {
         }
 
         File[] files = new File("db/migrations").listFiles();
+        Arrays.sort(files);
         for (File file : files) {
             boolean alreadyMigrated = false;
             String filename = file.getName();

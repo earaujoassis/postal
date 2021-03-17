@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.Optional;
 import javax.inject.Inject;
 import play.api.inject.Injector;
 import play.mvc.*;
@@ -34,6 +35,17 @@ public class HomeController extends Controller {
      */
     @Authentication(json = false)
     public Result index() {
+        JWTService jwtService = this.injector.instanceOf(JWTService.class);
+        UserSessionRepository userSessionRepository = this.injector.instanceOf(UserSessionRepository.class);
+        UserSession session = Optional.ofNullable(request().cookie("postal.session"))
+            .map(cookie -> cookie.value())
+            .map(sessionStr -> userSessionRepository.getActiveById(Integer.valueOf(jwtService.getSessionId(sessionStr))))
+            .orElseGet(() -> null);
+
+        if (session != null && session.stillValid()) {
+            return ok(views.html.index.render());
+        }
+
         return ok(views.html.landing.render());
     }
 
@@ -49,10 +61,12 @@ public class HomeController extends Controller {
     public Result signout() {
         JWTService jwtService = this.injector.instanceOf(JWTService.class);
         UserSessionRepository userSessionRepository = this.injector.instanceOf(UserSessionRepository.class);
-        String sessionStr = request().cookie("postal.session").value();
+        UserSession session = Optional.ofNullable(request().cookie("postal.session"))
+            .map(cookie -> cookie.value())
+            .map(sessionStr -> userSessionRepository.getById(Integer.valueOf(jwtService.getSessionId(sessionStr))))
+            .orElseGet(() -> null);
 
-        UserSession session = userSessionRepository.getById(Integer.valueOf(jwtService.getSessionId(sessionStr)));
-        if (session != null && !session.invalidated) {
+        if (session != null && session.stillValid()) {
             userSessionRepository.invalidate(session._id);
         }
 

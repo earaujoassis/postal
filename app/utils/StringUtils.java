@@ -58,6 +58,10 @@ public class StringUtils {
         }
 
         return result;
-  }
+    }
+
+    public static String trimTrailingSlashes(String input) {
+        return input.replaceFirst("/*$", "");
+    }
 
 }

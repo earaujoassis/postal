@@ -44,6 +44,7 @@ public class HttpHelper {
         try {
             url = new URL(_url);
             conn = (HttpURLConnection) url.openConnection();
+            conn.setInstanceFollowRedirects(false);
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
 
@@ -77,7 +78,7 @@ public class HttpHelper {
         try {
             status = conn.getResponseCode();
             if (status != 200) {
-                throw new HttpHelperException("HTTP response is not OK");
+                throw new HttpHelperException("HTTP response is not OK: " + conn.getResponseMessage());
             }
             input = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             while ((inputLine = input.readLine()) != null) {
@@ -87,7 +88,7 @@ public class HttpHelper {
             conn.disconnect();
         } catch (IOException err) {
             err.printStackTrace();
-            throw new HttpHelperException("connection failed");
+            throw new HttpHelperException("HTTP connection failed");
         }
 
         return content.toString();
