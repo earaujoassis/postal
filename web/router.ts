@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 
-import Authentication from "./components/Authentication";
+import Authentication from "./components/Authentication.vue";
 import Email from "./components/Email.vue";
 
 
