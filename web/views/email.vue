@@ -26,70 +26,16 @@
         </div>
         <div class="body" id="body-corpus-id">
             <router-view v-bind:key="$route.fullPath"></router-view>
-            <!-- <div v-if="state.currentEmail" class="body-header">
-                <span class="user-avatar"></span>
-                <div class="body-meta-box">
-                    <h2 class="body-subject">{{ state.currentEmail.subject }}</h2>
-                    <p><span class="user-name">{{ state.currentEmail.origin() }}</span> to {{ state.currentEmail.to[0] }}</p>
-                </div>
-            </div>
-            <div v-if="state.currentEmail" class="body-actions">
-                <ul class="actions">
-                    <li>
-                        <button
-                            @click="markAsUnread()"
-                            class="buttons button-envelope"
-                        >
-                            Mark as unread
-                        </button>
-                    </li>
-                    <li>
-                        <button class="buttons button-trash">Delete</button>
-                    </li>
-                </ul>
-            </div>
-            <div v-if="state.currentEmail" class="body-corpus">
-                <iframe
-                    @load="fixIFrameHeight"
-                    ref="currentEmailIFrame"
-                    v-if="state.currentEmail.bodyHTML"
-                    v-bind:srcdoc="state.currentEmail.bodyHTML"
-                    frameborder="0"
-                    height="0"
-                    scrolling="no"></iframe>
-                <div v-else v-html="state.currentEmail.corpus()"></div>
-            </div>
-            <ul class="replies">
-                <li>
-                    <div class="body-reply">
-                        <div class="body-header">
-                            <span class="user-avatar"></span>
-                            <div class="body-meta-box">
-                                <p><span class="user-name">Carlos Assis</span> to wired@newsletters.wired.com</p>
-                            </div>
-                        </div>
-                        <div class="body-corpus">
-                            <p>Hey, WIRED!</p>
-                            <p>
-                                Integer elementum mattis massa quis placerat. Nunc non nisi pellentesque, auctor elit ut, dignissim enim.
-                                Nulla interdum orci nunc, in vulputate lacus sollicitudin non. Etiam molestie condimentum nisi ut auctor. Fusce
-                                sodales malesuada odio sed finibus. Curabitur accumsan neque suscipit, pellentesque dui non, porta quam.
-                            </p>
-                            <p>Sincerely,<br>Carlos Assis</p>
-                        </div>
-                    </div>
-                </li>
-            </ul> -->
         </div>
     </div>
 </template>
 
 <script lang="ts">
     import Component from "vue-class-component";
-    import { Vue, Watch } from "vue-property-decorator";
+    import { Vue } from "vue-property-decorator";
     import { State, Action } from "vuex-class";
 
-    import { EmailsState } from "../store/modules/emails/types";
+    import { EmailsState } from "@/store/modules/emails/types";
 
     const namespace: string = "emails";
 
@@ -97,38 +43,107 @@
     export default class Email extends Vue {
         @State("emails") state!: EmailsState;
         @Action("fetchStatusData", { namespace }) fetchStatusData: any;
-        @Action("fetchEmailData", { namespace }) fetchEmailData: any;
-        @Action("markEmailsAsUnread", { namespace }) markEmailsAsUnread: any;
-        @Action("markEmailsAsRead", { namespace }) markEmailsAsRead: any;
+        @Action("fetchEmailsData", { namespace }) fetchEmailsData: any;
 
         mounted() {
-            this.fetchEmailData(this.$route.params.id);
-        }
-
-        @Watch("$route")
-        onRouterChange(to: any, _from: any) {
-            this.fetchEmailData(to.params.id);
-        }
-
-        @Watch("state", { deep: true })
-        markAsRead() {
-            if (this.state.currentEmail) {
-                let { metadata }: any = this.state.currentEmail;
-                if (metadata.read === false) {
-                    this.markEmailsAsRead(this.$route.params.id);
-                    this.fetchStatusData();
-                }
-            }
-        }
-
-        markAsUnread() {
-            this.markEmailsAsUnread(this.$route.params.id);
             this.fetchStatusData();
+            this.fetchEmailsData();
         }
 
-        fixIFrameHeight() {
-            let ref: any = this.$refs["currentEmailIFrame"];
-            ref.style.height = `${ref.contentWindow.document.body.scrollHeight}` + "px";
+        openEmailView(publicId: string) {
+            this.$router.push(`/${this.state.folder}/email/${publicId}`);
         }
     }
 </script>
+
+<style lang="less" scoped>
+.email-view {
+    display: flex;
+    flex-direction: row;
+    flex: 1 0;
+}
+
+.listing {
+    position: relative;
+    z-index: 100;
+    flex: 2 0;
+    max-width: 26vw;
+    border-right: 1px solid #e4e5e7;
+    box-shadow: 2px 0 20px 0 rgba(32, 130, 195, 0.125);
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.listing-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #27323f;
+    font-size: inherit;
+}
+
+.entry-box {
+    padding: 20px 22px;
+    border-bottom: 1px solid #dee2e7;
+    border-left: 5px solid #f25653;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: border-left 0.25s;
+
+    &:hover,
+    &:focus,
+    &:focus-within,
+    &.active {
+        box-shadow: inset 2px 0 20px 0 rgba(41, 46, 52, 0.0625);
+        background: #dee2e7;
+        transition: border-left 0.25s;
+    }
+
+    &.read {
+        background: #f6f8fa;
+        border-left: 0;
+        transition: border-left 0.25s;
+    }
+
+    &.active,
+    &.active.read {
+        border-left: 5px solid #5a6e8f;
+        transition: border-left 0.25s;
+    }
+
+    .entry-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .entry-author {
+        font-size: 1rem;
+    }
+
+    .entry-datetime {
+        align-self: flex-end;
+        color: #2f88c3;
+    }
+
+    .entry-subject {
+        font-size: 1rem;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .entry-excerpt {
+        font-weight: 300;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+}
+
+.body {
+    flex: 3 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-left: 5px;
+    background: #f9fbfa;
+}
+</style>

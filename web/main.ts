@@ -3,7 +3,7 @@ import Vue from "vue";
 import store from "./store";
 import router from "./router";
 import { sync } from "vuex-router-sync";
-import App from "./views/app.vue";
+import App from "@/views/App.vue";
 
 sync(store, router);
 
