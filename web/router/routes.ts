@@ -1,9 +1,10 @@
-import Email from "../views/email.vue";
-import Settings from "../views/settings.vue";
-import EmptyMessage from "../components/emptyMessage.vue";
-import EmailMessage from "../components/emailMessage.vue";
+import Email from "@/views/Email.vue";
+import Settings from "@/views/Settings.vue";
+import EmptyMessage from "@/components/EmptyMessage.vue";
+import EmailMessage from "@/components/EmailMessage.vue";
 
 const routes = [
+    { path: "/", redirect: "/inbox" },
     { path: "/settings", component: Settings },
     { path: "/:folder", component: Email,
         children: [
