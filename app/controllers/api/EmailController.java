@@ -1,4 +1,4 @@
-package controllers;
+package controllers.api;
 
 import javax.inject.Inject;
 import play.mvc.*;
@@ -13,7 +13,7 @@ import repositories.EmailRepository;
 import models.Email;
 
 @Authentication(enforce = true)
-public class ApiEmailController extends Controller {
+public class EmailController extends Controller {
 
     @Inject EmailRepository emailRepository;
 

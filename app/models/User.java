@@ -12,6 +12,7 @@ public class User {
 
     public final static String ENTITY_NAME = "user";
 
+    @JsonPropertyOrder(alphabetic=false)
     public static class Metadata {
 
         /**

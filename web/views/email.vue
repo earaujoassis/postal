@@ -2,7 +2,7 @@
     <div class="email-view">
         <div class="listing">
             <div class="listing-header">
-                <p>1&ndash;10 of {{ state.total }} messages</p>
+                <h3>1&ndash;10 of {{ state.total }} messages</h3>
             </div>
             <ul class="entries" role="tablist">
                 <li v-for="entry in state.emails" v-bind:key="entry.publicId">
@@ -41,7 +41,7 @@
 
     @Component
     export default class Email extends Vue {
-        @State("emails") state!: EmailsState;
+        @State(namespace) state!: EmailsState;
         @Action("fetchStatusData", { namespace }) fetchStatusData: any;
         @Action("fetchEmailsData", { namespace }) fetchEmailsData: any;
 
@@ -68,15 +68,15 @@
     z-index: 100;
     flex: 2 0;
     max-width: 26vw;
-    border-right: 1px solid #e4e5e7;
-    box-shadow: 2px 0 20px 0 rgba(32, 130, 195, 0.125);
+    border-right: 2px solid #D9DFE7;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.025);
     overflow-y: scroll;
     overflow-x: hidden;
 }
 
 .listing-header {
     padding: 18px 20px;
-    border-bottom: 1px solid #27323f;
+    border-bottom: 2px solid #D9DFE7;
     font-size: inherit;
 }
 
@@ -93,12 +93,12 @@
     &:focus-within,
     &.active {
         box-shadow: inset 2px 0 20px 0 rgba(41, 46, 52, 0.0625);
-        background: #dee2e7;
+        background: #fff;
         transition: border-left 0.25s;
     }
 
     &.read {
-        background: #f6f8fa;
+        background: #fff;
         border-left: 0;
         transition: border-left 0.25s;
     }
@@ -144,6 +144,6 @@
     overflow-y: scroll;
     overflow-x: hidden;
     padding-left: 5px;
-    background: #f9fbfa;
+    background: #fff;
 }
 </style>

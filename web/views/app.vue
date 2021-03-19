@@ -3,7 +3,7 @@
         <div class="sidebar">
             <div>
                 <h1 class="branding">
-                    <img src="//cdn.quatrolabs.com/quatrolabs-logo-white@2x.png" width="40" alt="qL" />
+                    <img src="//cdn.quatrolabs.com/quatrolabs-logo-small@2x.png" width="40" alt="qL" />
                     <span>Postal</span>
                 </h1>
                 <ul class="menu">
@@ -71,8 +71,9 @@
     flex: 1 0;
     max-width: 20vw;
     min-width: 260px;
-    background: #27323f;
-    color: #fff;
+    background: #fff;
+    border-right: 2px solid #D9DFE7;
+    color: #354053;
     overflow: hidden;
 
     .counter {
@@ -84,10 +85,11 @@
         font-weight: 500;
 
         > li {
-            padding: 6px 0;
+            padding: 8px 0;
 
             .active {
-                color: #fff;
+                color: #9DAABF;
+                background-color: #EFF3F7;
             }
 
             a {
@@ -104,8 +106,8 @@
 
                 &:hover,
                 &:focus {
-                    color: inherit;
-                    background: #292e34;
+                    color: #9DAABF;
+                    background: #EFF3F7;
                     transition: background 0.5s;
                 }
 

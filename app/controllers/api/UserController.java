@@ -1,4 +1,4 @@
-package controllers;
+package controllers.api;
 
 import javax.inject.Inject;
 import play.mvc.*;
@@ -12,7 +12,7 @@ import repositories.UserRepository;
 import models.User;
 
 @Authentication(enforce = true)
-public class ApiUserController extends Controller {
+public class UserController extends Controller {
 
     public Result show() {
         User user = request().attrs().get(AuthenticationAttrs.USER);
