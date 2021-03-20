@@ -2,7 +2,7 @@ package actions;
 
 import play.libs.typedmap.TypedKey;
 
-import models.User;
+import models.user.User;
 
 public class AuthenticationAttrs {
 

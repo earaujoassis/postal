@@ -17,7 +17,8 @@ import java.lang.reflect.Modifier;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import models.Email;
+import models.email.Email;
+import models.email.EmailMetadata;
 
 @Singleton
 public class EmailRepository extends AbstractEntityRepository {
@@ -132,7 +133,7 @@ public class EmailRepository extends AbstractEntityRepository {
         }
     }
 
-    public boolean update(String id, Email.Metadata metadata) {
+    public boolean update(String id, EmailMetadata metadata) {
         ObjectMapper objectMapper = new ObjectMapper();
         final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ?",
             this.tableName, Email.Attributes.METADATA, Email.Attributes.PUBLIC_ID);

@@ -27,8 +27,9 @@ import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import repositories.EmailRepository;
-import models.User;
-import models.Email;
+import models.user.User;
+import models.user.UserMetadata;
+import models.email.Email;
 
 public class RemoteStorageService implements IMailer {
 
@@ -49,7 +50,7 @@ public class RemoteStorageService implements IMailer {
             return;
         }
 
-        User.Metadata.RemoteStorage remoteSettings = user.metadata.remoteStorage;
+        UserMetadata.RemoteStorage remoteSettings = user.metadata.remoteStorage;
 
         credentials = new BasicAWSCredentials(remoteSettings.accessKey, remoteSettings.secretAccessKey);
         s3Encryption = AmazonS3EncryptionClientBuilder

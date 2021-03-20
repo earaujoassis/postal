@@ -15,7 +15,8 @@ import java.lang.reflect.Field;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import models.User;
+import models.user.User;
+import models.user.UserMetadata;
 
 @Singleton
 public class UserRepository extends AbstractEntityRepository {
@@ -157,7 +158,7 @@ public class UserRepository extends AbstractEntityRepository {
         }
     }
 
-    public boolean update(String id, User.Metadata metadata) {
+    public boolean update(String id, UserMetadata metadata) {
         ObjectMapper objectMapper = new ObjectMapper();
         final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ?",
             this.tableName, User.Attributes.METADATA, User.Attributes.EXTERNAL_ID);

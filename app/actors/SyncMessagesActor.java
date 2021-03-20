@@ -11,7 +11,7 @@ import actors.SyncMessagesActorProtocol.Request;
 import services.AppConfig;
 import services.RemoteStorageService;
 import repositories.UserRepository;
-import models.User;
+import models.user.User;
 
 public class SyncMessagesActor extends AbstractActor {
 
