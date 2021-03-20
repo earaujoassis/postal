@@ -10,7 +10,10 @@ import java.util.ArrayList;
 
 import actions.Authentication;
 import repositories.EmailRepository;
-import models.Email;
+import models.email.Email;
+import models.email.EmailMetadata;
+import models.email.EmailPresentation;
+import models.email.EmailSummary;
 
 @Authentication(enforce = true)
 public class EmailController extends Controller {
@@ -22,11 +25,11 @@ public class EmailController extends Controller {
     }
 
     public Result list(String folder) {
-        List<Email.Summary> emails = new ArrayList<Email.Summary>();
+        List<EmailSummary> emails = new ArrayList<EmailSummary>();
         Iterable<Email> docs = docs = this.emailRepository.getAll(folder);
 
         for (Email doc : docs) {
-            emails.add(new Email.Summary(doc));
+            emails.add(new EmailSummary(doc));
         }
 
         return ok(Json.toJson(emails));
@@ -39,11 +42,11 @@ public class EmailController extends Controller {
             return ok(Json.parse("null"));
         }
 
-        return ok(Json.toJson(new Email.Presentation(doc)));
+        return ok(Json.toJson(new EmailPresentation(doc)));
     }
 
     public Result update(String id) {
-        Email.Metadata metadata;
+        EmailMetadata metadata;
         JsonNode temporaryMetadata;
         JsonNode json = request().body().asJson();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -55,7 +58,7 @@ public class EmailController extends Controller {
             if (temporaryMetadata == null) {
                 return badRequest(String.format("Only `%s` is updatable", Email.Attributes.METADATA));
             } else {
-                metadata = (Email.Metadata) objectMapper.convertValue(temporaryMetadata, Email.Metadata.class);
+                metadata = (EmailMetadata) objectMapper.convertValue(temporaryMetadata, EmailMetadata.class);
                 this.emailRepository.update(id, metadata);
                 return noContent();
             }

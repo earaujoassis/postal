@@ -11,8 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import services.JWTService;
 import repositories.UserSessionRepository;
 import repositories.UserRepository;
-import models.UserSession;
-import models.User;
+import models.user.UserSession;
+import models.user.User;
 
 public class AuthenticationAction extends Action<Authentication> {
 

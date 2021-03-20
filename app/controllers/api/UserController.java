@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import actions.Authentication;
 import actions.AuthenticationAttrs;
 import repositories.UserRepository;
-import models.User;
+import models.user.User;
 
 @Authentication(enforce = true)
 public class UserController extends Controller {

@@ -2,7 +2,7 @@ package services;
 
 import java.util.List;
 
-import models.User;
+import models.user.User;
 
 public interface IMailer {
 

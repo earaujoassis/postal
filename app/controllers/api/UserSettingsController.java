@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import actions.Authentication;
 import actions.AuthenticationAttrs;
 import repositories.UserRepository;
-import models.User;
+import models.user.User;
 
 @Authentication(enforce = true)
 public class UserSettingsController extends Controller {
