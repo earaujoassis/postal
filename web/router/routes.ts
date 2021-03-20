@@ -9,7 +9,7 @@ const routes = [
     { path: "/:folder", component: Email,
         children: [
             { path: "", component: EmptyMessage },
-            { path: "/email/:id", component: EmailMessage },
+            { path: "email/:id", component: EmailMessage },
         ]
     }
 ];
