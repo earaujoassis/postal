@@ -10,9 +10,6 @@ import java.io.IOException;
 import play.api.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import com.bettercloud.vault.VaultException;
-import com.bettercloud.vault.VaultConfig;
-import com.bettercloud.vault.Vault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,11 +17,11 @@ import org.slf4j.LoggerFactory;
 public class AppConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(AppConfig.class);
-    private final Map<String, String> secrets;
+    private final Map<String, Object> secrets;
 
     @Inject
     public AppConfig(Config conf)
-    throws VaultException, IOException {
+    throws IOException {
         logger.info("Checking if local configuration exists");
         File localConfigFile = new File("conf/config.local.json");
 
@@ -35,21 +32,20 @@ public class AppConfig {
             return;
         }
 
-        logger.info("Local configuration unavailable; attempting connection to Vault");
-
-        final VaultConfig vaultConfig = new VaultConfig()
-                .address(conf.getString("postal.configuration_store.addr"))
-                .token(conf.getString("postal.configuration_store.token"))
-                .build();
-        final Vault vault = new Vault(vaultConfig, 1);
-        this.secrets = vault.logical()
-            .read(conf.getString("postal.configuration_store.path"))
-            .getData();
-        logger.info("Connection successful; configuration loaded");
+        throw new AppConfigException("Cannot open configuration file; aborting");
     }
 
+    public String getValueAsString(String key) {
+        return (String) this.secrets.get(key);
+    }
+
+    public int getValueAsInteger(String key) {
+        return ((Integer) this.secrets.get(key)).intValue();
+    }
+
+    @Deprecated(forRemoval = true)
     public String getValue(String key) {
-        return this.secrets.get(key);
+        return this.getValueAsString(key);
     }
 
 }

@@ -25,13 +25,13 @@ public class OAuthService {
 
     @Inject
     public OAuthService(AppConfig conf) {
-        this.redirectUriRaw = conf.getValue("space.redirect_uri");
+        this.redirectUriRaw = conf.getValue("space.redirectUri");
         this.redirectUri = StringUtils.encodeUriComponent(this.redirectUriRaw);
-        this.clientKey = conf.getValue("space.client_key");
-        this.clientSecret = conf.getValue("space.client_secret");
+        this.clientKey = conf.getValue("space.clientKey");
+        this.clientSecret = conf.getValue("space.clientSecret");
         this.clientAuthorizationToken = Base64.getEncoder().encodeToString(
             String.format("%s:%s", this.clientKey, this.clientSecret).getBytes());
-        this.baseUrl = StringUtils.trimTrailingSlashes(conf.getValue("space.base_url"));
+        this.baseUrl = StringUtils.trimTrailingSlashes(conf.getValue("space.baseUrl"));
         this.authorizeUrl = String.format("%s/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=",
             this.baseUrl, this.clientKey, this.redirectUri, this.scope);
     }

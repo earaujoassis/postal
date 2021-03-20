@@ -52,7 +52,7 @@ public class SyncMessagesActor extends AbstractActor {
 
         for (User user : users) {
             logger.info(String.format("Retrieving new messages for %s", user.toString()));
-            remoteStorageService.retrieveNewEmailMessagesForUser(user);
+            remoteStorageService.retrieveNewEmailMessagesForUser(user, this.conf.getValueAsInteger("workers.syncMessage.batchSize"));
         }
 
         logger.info("Finishing the sync messages task");
