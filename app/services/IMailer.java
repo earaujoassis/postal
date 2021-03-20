@@ -6,6 +6,6 @@ import models.user.User;
 
 public interface IMailer {
 
-    public void retrieveNewEmailMessagesForUser(User user);
+    public void retrieveNewEmailMessagesForUser(User user, int batchSize);
 
 }
