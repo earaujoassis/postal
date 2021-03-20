@@ -3,20 +3,19 @@
         <div class="settings-corpus-header">
             <h3 class="subsection-title">AWS S3 / Email messages</h3>
             <div class="subsection-actions">
-                <button class="button-cancel">Cancel</button>
-                <button class="button-save">Save</button>
+                <button @click="emitSave" class="button-save">Save</button>
             </div>
         </div>
         <div class="settings-corpus-body">
-            <form class="form" action="." method="POST">
+            <form @submit="emitSave" class="form" action="." method="POST">
                 <div class="form-group">
                     <div class="form-item">
                         <label for="aws-access-key">AWS Access Key</label>
-                        <input type="text" id="aws-access-key" :value="remoteStorage.accessKey" />
+                        <input type="text" id="aws-access-key" v-model="remoteStorageForm.accessKey" />
                     </div>
                     <div class="form-item">
                         <label for="aws-secret-access-key">AWS Secret Access Key</label>
-                        <input type="text" id="aws-secret-access-key" :value="remoteStorage.secretAccessKey" />
+                        <input type="password" id="aws-secret-access-key" v-model="remoteStorageForm.secretAccessKey" />
                     </div>
                 </div>
                 <div class="form-group">
@@ -26,16 +25,16 @@
                     </div>
                     <div class="form-item">
                         <label for="kms_key">AWS KMS ID</label>
-                        <input type="text" id="kms_key" :value="remoteStorage.kmsKey" />
+                        <input type="password" id="kms_key" v-model="remoteStorageForm.kmsKey" />
                     </div>
                 </div>
                 <div class="form-item">
                     <label for="bucket">Bucket</label>
-                    <input type="text" id="bucket" :value="remoteStorage.bucketName" />
+                    <input type="text" id="bucket" v-model="remoteStorageForm.bucketName" />
                 </div>
                 <div class="form-item">
                     <label for="prefix">Prefix</label>
-                    <input type="text" id="prefix" :value="remoteStorage.bucketPrefix" />
+                    <input type="text" id="prefix" v-model="remoteStorageForm.bucketPrefix" />
                 </div>
             </form>
         </div>
@@ -44,12 +43,17 @@
 
 <script lang="ts">
     import Component from "vue-class-component";
-    import { Vue, Prop } from "vue-property-decorator";
+    import { Vue, Prop, ModelSync } from "vue-property-decorator";
 
     import { RemoteStorage } from "@/store/modules/settings/types";
 
     @Component
     export default class EmailProvider extends Vue {
-        @Prop() remoteStorage?: RemoteStorage;
+        @Prop() remoteStorage?: RemoteStorage | undefined;
+        @ModelSync('remoteStorage', 'remoteStorage') remoteStorageForm!: RemoteStorage;
+
+        emitSave() {
+            this.$emit('save', this.remoteStorageForm);
+        }
     }
 </script>

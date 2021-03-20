@@ -28,6 +28,6 @@
 
     @Component
     export default class UserProfile extends Vue {
-        @Prop() profile?: IUserProfile;
+        @Prop() profile?: IUserProfile | undefined;
     }
 </script>
