@@ -76,7 +76,7 @@ public class RemoteStorageService implements IMailer {
             }
 
             String messageKey = objSummary.getKey();
-            if (!this.emailRepository.isEmailAvailable(messageKey)) {
+            if (!this.emailRepository.isEmailAvailable(user._id, messageKey)) {
                 batchItemsCounter++;
                 String rawMessage = s3Encryption.getObjectAsString(remoteSettings.bucketName, messageKey);
                 Session session = Session.getInstance(new Properties());

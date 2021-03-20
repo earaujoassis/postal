@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 import actions.Authentication;
+import actions.AuthenticationAttrs;
 import repositories.EmailRepository;
 import models.email.Email;
 import models.email.EmailMetadata;
 import models.email.EmailPresentation;
 import models.email.EmailSummary;
+import models.user.User;
 
 @Authentication(enforce = true)
 public class EmailController extends Controller {
@@ -21,12 +23,14 @@ public class EmailController extends Controller {
     @Inject EmailRepository emailRepository;
 
     public Result status() {
-        return ok(Json.toJson(this.emailRepository.status()));
+        User user = request().attrs().get(AuthenticationAttrs.USER);
+        return ok(Json.toJson(this.emailRepository.status(user._id)));
     }
 
     public Result list(String folder) {
+        User user = request().attrs().get(AuthenticationAttrs.USER);
         List<EmailSummary> emails = new ArrayList<EmailSummary>();
-        Iterable<Email> docs = docs = this.emailRepository.getAll(folder);
+        Iterable<Email> docs = docs = this.emailRepository.getAll(user._id, folder);
 
         for (Email doc : docs) {
             emails.add(new EmailSummary(doc));
@@ -36,7 +40,8 @@ public class EmailController extends Controller {
     }
 
     public Result show(String id) {
-        Email doc = this.emailRepository.getByPublicId(id);
+        User user = request().attrs().get(AuthenticationAttrs.USER);
+        Email doc = this.emailRepository.getByPublicId(user._id, id);
 
         if (doc == null) {
             return ok(Json.parse("null"));
@@ -50,6 +55,7 @@ public class EmailController extends Controller {
         JsonNode temporaryMetadata;
         JsonNode json = request().body().asJson();
         ObjectMapper objectMapper = new ObjectMapper();
+        User user = request().attrs().get(AuthenticationAttrs.USER);
 
         if (json == null) {
             return badRequest("Expecting JSON data");
@@ -59,7 +65,7 @@ public class EmailController extends Controller {
                 return badRequest(String.format("Only `%s` is updatable", Email.Attributes.METADATA));
             } else {
                 metadata = (EmailMetadata) objectMapper.convertValue(temporaryMetadata, EmailMetadata.class);
-                this.emailRepository.update(id, metadata);
+                this.emailRepository.update(user._id, id, metadata);
                 return noContent();
             }
         }
