@@ -1,10 +1,11 @@
 {
   "datastore.hostname": "postal-postgres:5432",
-  "datastore.name_prefix": "postal",
+  "datastore.namePrefix": "postal",
   "datastore.credentials": "postal:8Gy1Bvh5r3raqTRi",
-  "space.base_url": "",
-  "space.client_key": "",
-  "space.client_secret": "",
-  "space.redirect_uri": "",
+  "space.baseUrl": "",
+  "space.clientKey": "",
+  "space.clientSecret": "",
+  "space.redirectUri": "",
+  "workers.syncMessage.batchSize": 100,
   "jwt.secret": ""
 }

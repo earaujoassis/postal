@@ -8,12 +8,15 @@ GET     /signup                     controllers.HomeController.signup
 GET     /signout                    controllers.HomeController.signout
 GET     /callback                   controllers.HomeController.callback(code: String ?=null, scope: String ?=null, state: String ?=null)
 
-GET     /api/emails/status          controllers.ApiEmailController.status
-GET     /api/emails                 controllers.ApiEmailController.list(folder: String ?=null)
-GET     /api/emails/:id             controllers.ApiEmailController.show(id: String)
-PATCH   /api/emails/:id             controllers.ApiEmailController.update(id: String)
+GET     /api/emails/status          controllers.api.EmailController.status
+GET     /api/emails                 controllers.api.EmailController.list(folder: String ?=null)
+GET     /api/emails/:id             controllers.api.EmailController.show(id: String)
+PATCH   /api/emails/:id             controllers.api.EmailController.update(id: String)
 
-GET     /api/users                  controllers.ApiUserController.show
+GET     /api/users                  controllers.api.UserController.show
+
+GET     /api/settings               controllers.api.UserSettingsController.show
+PATCH   /api/settings               controllers.api.UserSettingsController.update
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

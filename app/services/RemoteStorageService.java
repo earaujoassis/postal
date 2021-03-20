@@ -27,8 +27,9 @@ import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import repositories.EmailRepository;
-import models.User;
-import models.Email;
+import models.user.User;
+import models.user.UserMetadata;
+import models.email.Email;
 
 public class RemoteStorageService implements IMailer {
 
@@ -39,17 +40,18 @@ public class RemoteStorageService implements IMailer {
         this.emailRepository = emailRepository;
     }
 
-    public void retrieveNewEmailMessagesForUser(User user) {
+    public void retrieveNewEmailMessagesForUser(User user, int batchSize) {
         AWSCredentials credentials;
         AmazonS3Encryption s3Encryption;
         ListObjectsV2Result bucket;
         List<S3ObjectSummary> objectSummaries;
+        int batchItemsCounter = 0;
 
         if (user == null || !user.metadata.hasRemoteStorage()) {
             return;
         }
 
-        User.Metadata.RemoteStorage remoteSettings = user.metadata.remoteStorage;
+        UserMetadata.RemoteStorage remoteSettings = user.metadata.remoteStorage;
 
         credentials = new BasicAWSCredentials(remoteSettings.accessKey, remoteSettings.secretAccessKey);
         s3Encryption = AmazonS3EncryptionClientBuilder
@@ -64,13 +66,18 @@ public class RemoteStorageService implements IMailer {
         objectSummaries.sort(new Comparator<S3ObjectSummary>() {
             @Override
             public int compare(S3ObjectSummary obj1, S3ObjectSummary obj2) {
-                // reverse sorting
-                return obj2.getLastModified().compareTo(obj1.getLastModified());
+                // descending ordering
+                return obj1.getLastModified().compareTo(obj2.getLastModified());
             }
         });
         for (S3ObjectSummary objSummary : objectSummaries) {
+            if (batchItemsCounter >= batchSize) {
+                break;
+            }
+
             String messageKey = objSummary.getKey();
-            if (!this.emailRepository.isEmailAvailable(messageKey)) {
+            if (!this.emailRepository.isEmailAvailable(user._id, messageKey)) {
+                batchItemsCounter++;
                 String rawMessage = s3Encryption.getObjectAsString(remoteSettings.bucketName, messageKey);
                 Session session = Session.getInstance(new Properties());
                 InputStream inputStream = new ByteArrayInputStream(rawMessage.getBytes());

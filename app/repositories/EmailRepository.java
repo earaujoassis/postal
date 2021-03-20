@@ -17,7 +17,8 @@ import java.lang.reflect.Modifier;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import models.Email;
+import models.email.Email;
+import models.email.EmailMetadata;
 
 @Singleton
 public class EmailRepository extends AbstractEntityRepository {
@@ -32,9 +33,9 @@ public class EmailRepository extends AbstractEntityRepository {
         this.store = store;
     }
 
-    public Iterable<Email> getAll(String folder) {
-        final String SQL = String.format("SELECT %s FROM %s ORDER BY %s DESC LIMIT(10)",
-            this.allFields, this.tableName, Email.Attributes.SENT_AT);
+    public Iterable<Email> getAll(Integer userId, String folder) {
+        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ? ORDER BY %s DESC LIMIT(10)",
+            this.allFields, this.tableName, Email.Attributes.USER_ID, Email.Attributes.SENT_AT);
         List<Email> target = new ArrayList<>();
         List<Map<String, Object>> results;
         PreparedStatement pStmt;
@@ -42,6 +43,7 @@ public class EmailRepository extends AbstractEntityRepository {
 
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setInt(1, userId);
             rs = pStmt.executeQuery();
             results = this.fromResultSetToListOfHashes(rs);
             pStmt.close();
@@ -57,16 +59,17 @@ public class EmailRepository extends AbstractEntityRepository {
         return target;
     }
 
-    public Email getByPublicId(String id) {
-        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ?",
-            this.allFields, this.tableName, Email.Attributes.PUBLIC_ID);
+    public Email getByPublicId(Integer userId, String id) {
+        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ? AND %s = ?",
+            this.allFields, this.tableName, Email.Attributes.USER_ID, Email.Attributes.PUBLIC_ID);
         List<Map<String, Object>> results;
         PreparedStatement pStmt;
         ResultSet rs;
 
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
-            pStmt.setString(1, id);
+            pStmt.setInt(1, userId);
+            pStmt.setString(2, id);
             rs = pStmt.executeQuery();
             results = this.fromResultSetToListOfHashes(rs);
             pStmt.close();
@@ -132,10 +135,10 @@ public class EmailRepository extends AbstractEntityRepository {
         }
     }
 
-    public boolean update(String id, Email.Metadata metadata) {
+    public boolean update(Integer userId, String id, EmailMetadata metadata) {
         ObjectMapper objectMapper = new ObjectMapper();
-        final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ?",
-            this.tableName, Email.Attributes.METADATA, Email.Attributes.PUBLIC_ID);
+        final String SQL = String.format("UPDATE %s SET %s = (?)::json WHERE %s = ? AND %s = ?",
+            this.tableName, Email.Attributes.METADATA, Email.Attributes.USER_ID, Email.Attributes.PUBLIC_ID);
         String metadataJSONString;
         PreparedStatement pStmt;
 
@@ -149,7 +152,8 @@ public class EmailRepository extends AbstractEntityRepository {
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
             pStmt.setString(1, metadataJSONString);
-            pStmt.setString(2, id);
+            pStmt.setInt(2, userId);
+            pStmt.setString(3, id);
             pStmt.execute();
             pStmt.close();
             return true;
@@ -159,16 +163,18 @@ public class EmailRepository extends AbstractEntityRepository {
         }
     }
 
-    public Map<String, Long> status() {
+    public Map<String, Long> status(Integer userId) {
         Map<String, Long> status = new HashMap<String, Long>();
-        final String SQLTotal = String.format("SELECT count(*) FROM %s", this.tableName);
-        final String SQLRead = String.format("SELECT count(*) FROM %s WHERE (%s->>'%s')::boolean is false",
-            this.tableName, Email.Attributes.METADATA, "read");
+        final String SQLTotal = String.format("SELECT count(*) FROM %s WHERE %s = ?",
+            this.tableName, Email.Attributes.USER_ID);
+        final String SQLRead = String.format("SELECT count(*) FROM %s WHERE %s = ? AND (%s->>'%s')::boolean is false",
+            this.tableName, Email.Attributes.USER_ID, Email.Attributes.METADATA, "read");
         PreparedStatement pStmt;
         ResultSet rs;
 
         try {
             pStmt = this.store.conn.prepareStatement(SQLTotal);
+            pStmt.setInt(1, userId);
             rs = pStmt.executeQuery();
             rs.next();
             status.put("total", Long.valueOf(rs.getInt(1)));
@@ -180,6 +186,7 @@ public class EmailRepository extends AbstractEntityRepository {
 
         try {
             pStmt = this.store.conn.prepareStatement(SQLRead);
+            pStmt.setInt(1, userId);
             rs = pStmt.executeQuery();
             rs.next();
             status.put("unread", Long.valueOf(rs.getInt(1)));
@@ -192,16 +199,17 @@ public class EmailRepository extends AbstractEntityRepository {
         return status;
     }
 
-    public boolean isEmailAvailable(String key) {
-        final String SQL = String.format("SELECT count(*) FROM %s WHERE %s = ?",
-            this.tableName, Email.Attributes.BUCKET_KEY);
+    public boolean isEmailAvailable(Integer userId, String key) {
+        final String SQL = String.format("SELECT count(*) FROM %s WHERE %s = ? AND %s = ?",
+            this.tableName, Email.Attributes.USER_ID, Email.Attributes.BUCKET_KEY);
         PreparedStatement pStmt;
         ResultSet rs;
         boolean emailAvailable = false;
 
         try {
             pStmt = this.store.conn.prepareStatement(SQL);
-            pStmt.setString(1, key);
+            pStmt.setInt(1, userId);
+            pStmt.setString(2, key);
             rs = pStmt.executeQuery();
             rs.next();
             emailAvailable = rs.getInt(1) > 0;

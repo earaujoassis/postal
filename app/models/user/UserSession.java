@@ -1,4 +1,4 @@
-package models;
+package models.user;
 
 import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.io.IOException;
+
+import models.SqlField;
 
 @JsonPropertyOrder(alphabetic=false)
 public class UserSession {

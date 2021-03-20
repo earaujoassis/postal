@@ -1,6 +1,6 @@
 package services;
 
-import models.User;
+import models.user.User;
 
 public abstract class AbstractSMTPService implements IMailer {
 

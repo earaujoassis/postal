@@ -1,7 +1,7 @@
 import { MutationTree } from "vuex";
 
 import { EmailsState, EmailSummary, EmailFull } from "./types";
-import router from "../router";
+import router from "@/router";
 
 export const mutations: MutationTree<EmailsState> = {
     statusLoaded(state, status: any) {

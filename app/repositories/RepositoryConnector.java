@@ -32,7 +32,7 @@ public class RepositoryConnector {
     public RepositoryConnector(AppConfig conf) {
         final String environment = Environment.currentEnvironment();
         final String hostname = conf.getValue("datastore.hostname");
-        final String dbName = String.format("%s_%s", conf.getValue("datastore.name_prefix"), environment);
+        final String dbName = String.format("%s_%s", conf.getValue("datastore.namePrefix"), environment);
         final String url = String.format("jdbc:postgresql://%s/%s", hostname, dbName);
 
         this.conn = null;
