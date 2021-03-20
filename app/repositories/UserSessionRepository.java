@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import org.postgresql.util.PSQLException;
 import java.lang.reflect.Field;
 
-import models.UserSession;
+import models.user.UserSession;
 
 @Singleton
 public class UserSessionRepository extends AbstractEntityRepository {

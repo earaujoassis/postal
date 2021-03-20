@@ -15,8 +15,8 @@ import services.OAuthServiceException;
 import services.JWTService;
 import repositories.UserRepository;
 import repositories.UserSessionRepository;
-import models.UserSession;
-import models.User;
+import models.user.UserSession;
+import models.user.User;
 
 /**
  * This controller contains an action to handle HTTP requests

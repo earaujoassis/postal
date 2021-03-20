@@ -1,4 +1,4 @@
-package models;
+package models.email;
 
 import java.util.Map;
 import java.util.List;
@@ -10,105 +10,14 @@ import javax.mail.Address;
 import org.jsoup.Jsoup;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.io.IOException;
 
+import models.SqlField;
 import utils.StringUtils;
 
 public class Email {
 
     public final static String ENTITY_NAME = "email";
-
-    @JsonPropertyOrder(alphabetic=false)
-    public static class Summary {
-
-        public final String publicId;
-        public final OffsetDateTime sentAt;
-        public final String subject;
-        public final String from;
-        public final String fromPersonal;
-        public final Metadata metadata;
-
-        private final String bodyPlain;
-        private final String bodyHTML;
-
-        public Summary(Email source) {
-            this.publicId = source.publicId;
-            this.sentAt = source.sentAt;
-            this.subject = source.subject;
-            this.from = source.from;
-            this.fromPersonal = source.fromPersonal;
-            this.bodyPlain = source.bodyPlain;
-            this.bodyHTML = source.bodyHTML;
-            this.metadata = source.metadata;
-        }
-
-        public String getExcerpt() {
-            Pattern urlPattern = Pattern.compile(
-                "((https?|ftp|http):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)",
-                Pattern.CASE_INSENSITIVE);
-            Pattern garbagePattern = Pattern.compile(
-                "([-_=]{2,})",
-                Pattern.CASE_INSENSITIVE);
-            String excerpt;
-
-            if (this.bodyHTML != null) {
-                excerpt = Jsoup.parse(this.bodyHTML).text();
-                return garbagePattern.matcher(excerpt).replaceAll("");
-            } else if (this.bodyPlain != null) {
-                excerpt = this.bodyPlain;
-                return garbagePattern.matcher(urlPattern.matcher(excerpt).replaceAll("")).replaceAll("");
-            }
-
-            return "not available";
-        }
-
-    }
-
-    @JsonPropertyOrder(alphabetic=false)
-    public static class Presentation {
-
-        public final String publicId;
-        public final OffsetDateTime sentAt;
-        public final String subject;
-        public final String from;
-        public final String fromPersonal;
-        public final String to;
-        public final String bcc;
-        public final String cc;
-        public final String replyTo;
-        public final String bodyPlain;
-        public final String bodyHTML;
-        public final Metadata metadata;
-
-        public Presentation(Email source) {
-            this.publicId = source.publicId;
-            this.sentAt = source.sentAt;
-            this.subject = source.subject;
-            this.from = source.from;
-            this.fromPersonal = source.fromPersonal;
-            this.to = source.to;
-            this.bcc = source.bcc;
-            this.cc = source.cc;
-            this.replyTo = source.replyTo;
-            this.bodyPlain = source.bodyPlain;
-            this.bodyHTML = source.bodyHTML;
-            this.metadata = source.metadata;
-        }
-
-    }
-
-    public static class Metadata {
-
-        public final boolean read;
-        public final String folder;
-
-        public Metadata() {
-            this.read = false;
-            this.folder = null;
-        }
-
-    }
 
     public static class Attributes {
         public final static String PUBLIC_ID = "public_id";
@@ -168,7 +77,7 @@ public class Email {
     public final String bodyHTML;
 
     @SqlField(name = Attributes.METADATA)
-    public Metadata metadata;
+    public EmailMetadata metadata;
 
     public Email(final Integer userId,
                  final String bucketKey,
@@ -196,7 +105,7 @@ public class Email {
         this.bodyHTML = bodyHTML;
 
         this.publicId = StringUtils.generateRandomString(64);
-        this.metadata = new Metadata();
+        this.metadata = new EmailMetadata();
     }
 
     public Email(Object hash) {
@@ -219,25 +128,25 @@ public class Email {
         this.bodyPlain = (String) email.get(Attributes.BODY_PLAIN);
         this.bodyHTML = (String) email.get(Attributes.BODY_HTML);
 
-        this.metadata = new Metadata();
+        this.metadata = new EmailMetadata();
         metadata = email.get(Attributes.METADATA);
         if (metadata != null) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                this.metadata = (Metadata) objectMapper.readValue(metadata.toString(), Metadata.class);
+                this.metadata = (EmailMetadata) objectMapper.readValue(metadata.toString(), EmailMetadata.class);
             } catch (IOException e) {
                 e.printStackTrace();
-                this.metadata = new Metadata();
+                this.metadata = new EmailMetadata();
             }
         }
     }
 
-    public Summary toSummary() {
-        return new Summary(this);
+    public EmailSummary toSummary() {
+        return new EmailSummary(this);
     }
 
-    public Presentation toPresentation() {
-        return new Presentation(this);
+    public EmailPresentation toPresentation() {
+        return new EmailPresentation(this);
     }
 
     public static String parseAddressList(List<Address> addresses) {
