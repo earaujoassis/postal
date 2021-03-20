@@ -2,7 +2,7 @@
     <div class="settings-view section-padding">
         <h2 class="section-title"># Settings</h2>
         <UserProfile :profile="state.profile" />
-        <EmailProvider :remoteStorage="state.settings.remoteStorage || {}" />
+        <EmailProvider :remoteStorage="state.settings.remoteStorage || {}" @save="onSave" />
     </div>
 </template>
 
@@ -14,9 +14,16 @@
     import EmailProvider from "@/components/EmailProvider.vue";
     import UserProfile from "@/components/UserProfile.vue";
 
-    import { SettingsState } from "@/store/modules/settings/types";
+    import { SettingsState, RemoteStorage, Settings as ISettings } from "@/store/modules/settings/types";
 
     const namespace: string = "settings";
+    const emptyRemoteStorage: RemoteStorage = {
+        accessKey: "",
+        secretAccessKey: "",
+        kmsKey: "",
+        bucketName: "",
+        bucketPrefix: ""
+    }
 
     @Component({
         components: {
@@ -31,6 +38,15 @@
 
         mounted() {
             this.fetchSettingsData();
+        }
+
+        onSave(value: RemoteStorage | undefined) {
+            if (value) {
+                let settings: ISettings = {
+                    remoteStorage: Object.assign(emptyRemoteStorage, value)
+                };
+                this.updateSettingsData(settings);
+            }
         }
     }
 </script>
