@@ -3,6 +3,7 @@ package models.email;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.time.format.DateTimeFormatter;
 import java.time.OffsetDateTime;
@@ -108,6 +109,36 @@ public class Email {
         this.metadata = new EmailMetadata();
     }
 
+    public Email(final Integer userId,
+                 final String bucketKey,
+                 final OffsetDateTime sentAt,
+                 final String subject,
+                 final String from,
+                 final String fromPersonal,
+                 final String to,
+                 final String bcc,
+                 final String cc,
+                 final String replyTo,
+                 final String bodyPlain,
+                 final String bodyHTML,
+                 final EmailMetadata metadata) {
+        this.userId = userId;
+        this.bucketKey = bucketKey;
+        this.sentAt = sentAt;
+        this.subject = subject;
+        this.from = from;
+        this.fromPersonal = fromPersonal;
+        this.to = to;
+        this.bcc = bcc;
+        this.cc = cc;
+        this.replyTo = replyTo;
+        this.bodyPlain = bodyPlain;
+        this.bodyHTML = bodyHTML;
+        this.metadata = metadata;
+
+        this.publicId = StringUtils.generateRandomString(64);
+    }
+
     public Email(Object hash) {
         Map<String, Object> email = (Map<String, Object>) hash;
         Object metadata;
@@ -155,6 +186,11 @@ public class Email {
             newList.add(address.toString());
         }
         return String.join(", ", newList);
+    }
+
+    public boolean validFolder(String folder) {
+        String[] folders = new String[]{EmailFolder.INBOX, EmailFolder.SPAM, EmailFolder.TRASH};
+        return Arrays.stream(folders).anyMatch(folder::equals);
     }
 
 }
