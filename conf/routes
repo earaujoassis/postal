@@ -8,6 +8,8 @@ GET     /signup                     controllers.HomeController.signup
 GET     /signout                    controllers.HomeController.signout
 GET     /callback                   controllers.HomeController.callback(code: String ?=null, scope: String ?=null, state: String ?=null)
 
+GET     /api/health-check           controllers.api.HealthCheckController.status
+
 GET     /api/emails/status          controllers.api.EmailController.status
 GET     /api/emails                 controllers.api.EmailController.list(folder: String ?=null)
 GET     /api/emails/:id             controllers.api.EmailController.show(id: String)
