@@ -34,6 +34,33 @@ public class EmailRepository extends AbstractEntityRepository {
     }
 
     public Iterable<Email> getAll(Integer userId, String folder) {
+        final String SQL = String.format("SELECT %s FROM %s WHERE %s = ? AND %s->>'%s' = ? ORDER BY %s DESC LIMIT(10)",
+            this.allFields, this.tableName, Email.Attributes.USER_ID, Email.Attributes.METADATA, "folder", Email.Attributes.SENT_AT);
+        List<Email> target = new ArrayList<>();
+        List<Map<String, Object>> results;
+        PreparedStatement pStmt;
+        ResultSet rs;
+
+        try {
+            pStmt = this.store.conn.prepareStatement(SQL);
+            pStmt.setInt(1, userId);
+            pStmt.setString(2, folder);
+            rs = pStmt.executeQuery();
+            results = this.fromResultSetToListOfHashes(rs);
+            pStmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return target;
+        }
+
+        for (Map<String, Object> hash : results) {
+            target.add(new Email(hash));
+        }
+
+        return target;
+    }
+
+    public Iterable<Email> getAll(Integer userId) {
         final String SQL = String.format("SELECT %s FROM %s WHERE %s = ? ORDER BY %s DESC LIMIT(10)",
             this.allFields, this.tableName, Email.Attributes.USER_ID, Email.Attributes.SENT_AT);
         List<Email> target = new ArrayList<>();

@@ -4,7 +4,11 @@ import { EmailsState, EmailSummary, EmailFull } from "./types";
 import { RootState } from "@/store/types";
 
 export const actions: ActionTree<EmailsState, RootState> = {
-    fetchStatusData({ commit }): any {
+    updateCurrentFolder({ commit }, folder: string): any {
+        commit("updateFolder", folder);
+    },
+
+    fetchStatus({ commit }): any {
         fetch("/api/emails/status")
             .then(response => response.json())
             .then((status: any) => {
@@ -15,8 +19,8 @@ export const actions: ActionTree<EmailsState, RootState> = {
             });
     },
 
-    fetchEmailsData({ commit }): any {
-        fetch("/api/emails")
+    fetchEmails({ commit }, folder: string): any {
+        fetch(!!folder ? `/api/emails?folder=${folder}` : "/api/emails")
             .then(response => response.json())
             .then((entries: Array<any>) => {
                 const emails: Array<EmailSummary> = entries.map((entry: any) => new EmailSummary(entry));
@@ -27,7 +31,7 @@ export const actions: ActionTree<EmailsState, RootState> = {
             });
     },
 
-    fetchEmailData({ commit }, publicId): any {
+    fetchEmail({ commit }, publicId): any {
         fetch(`/api/emails/${publicId}`)
             .then(response => response.json())
             .then((entry: any) => {
