@@ -9,13 +9,13 @@ export const mutations: MutationTree<EmailsState> = {
     },
 
     statusLoaded(state, status: any) {
-        state.total = status.total;
-        state.unread = status.unread;
+        state.allUnread = status.unread;
     },
 
-    emailsLoaded(state, emails: Array<EmailSummary>) {
+    emailsLoaded(state, { emails, total }) {
         state.error = false;
         state.emails = emails;
+        state.total = total;
     },
 
     currentEmailLoaded(state, email: EmailFull) {
@@ -39,6 +39,19 @@ export const mutations: MutationTree<EmailsState> = {
         for (let email of emails) {
             if (email.publicId === publicId) {
                 email.metadata.read = false;
+                break;
+            }
+        }
+        state.emails = emails;
+        state.currentEmail = undefined;
+        router.push(`/${state.folder}/`);
+    },
+
+    emailMoved(state, { publicId, folder }) {
+        let emails: Array<EmailSummary> = state.emails;
+        for (let email of emails) {
+            if (email.publicId === publicId) {
+                email.metadata.folder = folder;
                 break;
             }
         }

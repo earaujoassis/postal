@@ -18,7 +18,12 @@
                     </button>
                 </li>
                 <li>
-                    <button class="buttons button-trash">Delete</button>
+                    <button
+                        @click="moveToTrash()"
+                        class="buttons button-trash"
+                    >
+                        Delete
+                    </button>
                 </li>
             </ul>
         </div>
@@ -71,8 +76,10 @@
         @State("emails") state!: EmailsState;
         @Action("fetchStatus", { namespace }) fetchStatus: any;
         @Action("fetchEmail", { namespace }) fetchEmail: any;
+        @Action("fetchEmails", { namespace }) fetchEmails: any;
         @Action("markEmailsAsUnread", { namespace }) markEmailsAsUnread: any;
         @Action("markEmailsAsRead", { namespace }) markEmailsAsRead: any;
+        @Action("moveEmailToFolder", { namespace }) moveEmailToFolder: any;
 
         mounted() {
             this.fetchEmail(this.$route.params.id);
@@ -96,6 +103,12 @@
 
         markAsUnread() {
             this.markEmailsAsUnread(this.$route.params.id);
+            this.fetchStatus();
+        }
+
+        moveToTrash() {
+            this.moveEmailToFolder({ publicId: this.$route.params.id, folder: 'trash' });
+            this.fetchEmails(this.state.folder);
             this.fetchStatus();
         }
 

@@ -44,6 +44,8 @@ public class EmailRepository extends AbstractEntityRepository {
         List<Map<String, Object>> results = QueryBuilder.forModel(Email.class).bind(this.store)
             .select().from()
             .where("user_id = ?", userId)
+            .and("(metadata->>'folder')::text not like 'trash'")
+            .or("(metadata->'folder')::text like 'null'")
             .orderByDesc("sent_at")
             .limit(10)
             .getAll();
@@ -53,6 +55,23 @@ public class EmailRepository extends AbstractEntityRepository {
         }
 
         return target;
+    }
+
+    public int getCount(Integer userId, String folder) {
+        return QueryBuilder.forModel(Email.class).bind(this.store)
+            .select("count(*)").from()
+            .where("user_id = ?", userId)
+            .and("metadata->>'folder' = ?", folder)
+            .getCount();
+    }
+
+    public int getCount(Integer userId) {
+        return QueryBuilder.forModel(Email.class).bind(this.store)
+            .select("count(*)").from()
+            .where("user_id = ?", userId)
+            .and("(metadata->>'folder')::text not like 'trash'")
+            .or("(metadata->'folder')::text like 'null'")
+            .getCount();
     }
 
     public Email getByPublicId(Integer userId, String id) {
@@ -87,15 +106,8 @@ public class EmailRepository extends AbstractEntityRepository {
 
     public Map<String, Integer> status(Integer userId) {
         Map<String, Integer> status = new HashMap<String, Integer>();
-        int totalResult;
         int unreadResult;
 
-        totalResult = QueryBuilder.forModel(Email.class).bind(this.store)
-            .select("count(*)")
-            .from()
-            .where("user_id = ?", userId)
-            .getCount();
-        status.put("total", Integer.valueOf(totalResult));
         unreadResult = QueryBuilder.forModel(Email.class).bind(this.store)
             .select("count(*)")
             .from()

@@ -93,14 +93,14 @@ public class QueryBuilder extends QueryBuilderInstropector {
     }
 
     public QueryBuilder or(String whereOr, Object queryArgmnt) {
-        this.where = String.format("%s AND %s",
+        this.where = String.format("%s OR %s",
             this.where, whereOr).trim();
         this.addArgument(queryArgmnt);
         return this;
     }
 
     public QueryBuilder or(String whereOr) {
-        this.where = String.format("%s AND %s",
+        this.where = String.format("%s OR %s",
             this.where, whereOr).trim();
         return this;
     }
@@ -136,8 +136,10 @@ public class QueryBuilder extends QueryBuilderInstropector {
         try {
             pStmt = this.connector.getConnection().prepareStatement(sql);
             int index = 1;
-            for (Object argument : arguments) {
-                pStmt.setObject(index++, argument);
+            if (this.arguments != null) {
+                for (Object argument : this.arguments) {
+                    pStmt.setObject(index++, argument);
+                }
             }
             results = this.fromResultSetToListOfHashes(pStmt.executeQuery(), modelClass);
             pStmt.close();
@@ -174,8 +176,10 @@ public class QueryBuilder extends QueryBuilderInstropector {
         try {
             pStmt = this.connector.getConnection().prepareStatement(sql);
             int index = 1;
-            for (Object argument : arguments) {
-                pStmt.setObject(index++, argument);
+            if (this.arguments != null) {
+                for (Object argument : this.arguments) {
+                    pStmt.setObject(index++, argument);
+                }
             }
             resultSet = pStmt.executeQuery();
             resultSet.next();
@@ -309,6 +313,9 @@ public class QueryBuilder extends QueryBuilderInstropector {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            throw new QueryBuilderException("No arguments; cannot UPDATE");
         }
     }
 
