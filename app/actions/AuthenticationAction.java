@@ -28,11 +28,14 @@ public class AuthenticationAction extends Action<Authentication> {
         String sessionStr = null;
 
         try {
-            sessionStr = request.cookie("postal.session").value();
-            session = userSessionRepository.getById(Integer.valueOf(jwtService.getSessionId(sessionStr)));
-            user = userRepository.getById(session.userId);
-            if (user == null && shouldEnforce) {
-                return promiseResult(configuration.json());
+            if (shouldEnforce) {
+                sessionStr = request.cookie("postal.session").value();
+                session = userSessionRepository.getById(Integer.valueOf(jwtService.getSessionId(sessionStr)));
+                user = userRepository.getById(session.userId);
+
+                if (user == null) {
+                    return promiseResult(configuration.json());
+                }
             }
         } catch (NullPointerException e) {
             if (shouldEnforce) {
