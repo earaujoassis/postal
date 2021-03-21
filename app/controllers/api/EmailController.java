@@ -5,6 +5,7 @@ import play.mvc.*;
 import play.libs.Json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -31,18 +32,25 @@ public class EmailController extends Controller {
         User user = request().attrs().get(AuthenticationAttrs.USER);
         List<EmailSummary> emails = new ArrayList<EmailSummary>();
         Iterable<Email> docs;
+        int totalCount;
 
         if (folder == null) {
             docs = this.emailRepository.getAll(user._id);
+            totalCount = this.emailRepository.getCount(user._id);
         } else {
             docs = this.emailRepository.getAll(user._id, folder);
+            totalCount = this.emailRepository.getCount(user._id, folder);
         }
 
         for (Email doc : docs) {
             emails.add(new EmailSummary(doc));
         }
 
-        return ok(Json.toJson(emails));
+        ObjectNode result = Json.newObject();
+        result.put("emails", Json.toJson(emails));
+        result.put("total", Json.toJson(totalCount));
+
+        return ok(Json.toJson(result));
     }
 
     public Result show(String id) {
@@ -57,7 +65,7 @@ public class EmailController extends Controller {
     }
 
     public Result update(String id) {
-        EmailMetadata metadata;
+        EmailMetadata localMetadata, alienMetadata, merged;
         JsonNode temporaryMetadata;
         JsonNode json = request().body().asJson();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -70,8 +78,10 @@ public class EmailController extends Controller {
             if (temporaryMetadata == null) {
                 return badRequest(String.format("Only `%s` is updatable", Email.Attributes.METADATA));
             } else {
-                metadata = (EmailMetadata) objectMapper.convertValue(temporaryMetadata, EmailMetadata.class);
-                this.emailRepository.update(user._id, id, metadata);
+                alienMetadata = (EmailMetadata) objectMapper.convertValue(temporaryMetadata, EmailMetadata.class);
+                localMetadata = this.emailRepository.getByPublicId(user._id, id).metadata;
+                merged = EmailMetadata.merge(localMetadata, alienMetadata);
+                this.emailRepository.update(user._id, id, merged);
                 return noContent();
             }
         }
