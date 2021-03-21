@@ -25,7 +25,10 @@ import services.AppConfig;
 @Singleton
 public class RepositoryConnector {
 
+    private final int TIMEOUT_IN_SECONDS = 5;
+
     private final static Logger logger = LoggerFactory.getLogger(RepositoryConnector.class);
+
     private Connection conn;
     private AppConfig conf;
 
@@ -189,6 +192,18 @@ public class RepositoryConnector {
         }
 
         return this.conn;
+    }
+
+    public boolean isHealthy() {
+        Connection connection = this.getConnection();
+        try {
+            return (connection != null &&
+                connection.isValid(TIMEOUT_IN_SECONDS) ||
+                connection.isClosed());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
