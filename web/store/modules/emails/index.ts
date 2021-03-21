@@ -13,7 +13,7 @@ export const state: EmailsState = {
     currentEmail: undefined!,
     error: false,
     total: 0,
-    unread: 0
+    allUnread: 0
 };
 
 export const emails: Module<EmailsState, RootState> = {

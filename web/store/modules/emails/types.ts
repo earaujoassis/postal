@@ -99,8 +99,8 @@ export class EmailFull extends EmailSummary {
 export interface EmailsState {
     folder: string;
     emails: Array<EmailSummary>;
+    total: number;
     currentEmail?: EmailFull;
     error: boolean;
-    total: number;
-    unread: number;
+    allUnread: number;
 }
