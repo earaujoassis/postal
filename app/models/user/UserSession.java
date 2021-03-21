@@ -7,9 +7,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.io.IOException;
 
-import models.SqlField;
+import relational.SqlTable;
+import relational.SqlField;
 
 @JsonPropertyOrder(alphabetic=false)
+@SqlTable(name = "user_sessions")
 public class UserSession {
 
     public final static String ENTITY_NAME = "user_session";

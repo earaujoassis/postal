@@ -108,6 +108,7 @@ public class HomeController extends Controller {
             if (!userSessionRepository.insert(session)) {
                 return redirect("/?error=session_creation");
             }
+            session = userSessionRepository.getByAccessToken(session.accessToken);
             sessionStr = jwtService.signToken(session._id.toString());
         } catch (OAuthServiceException err) {
             err.printStackTrace();

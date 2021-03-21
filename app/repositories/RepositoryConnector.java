@@ -26,36 +26,13 @@ import services.AppConfig;
 public class RepositoryConnector {
 
     private final static Logger logger = LoggerFactory.getLogger(RepositoryConnector.class);
-    protected Connection conn;
+    private Connection conn;
+    private AppConfig conf;
 
     @Inject
     public RepositoryConnector(AppConfig conf) {
-        final String environment = Environment.currentEnvironment();
-        final String hostname = conf.getValue("datastore.hostname");
-        final String dbName = String.format("%s_%s", conf.getValue("datastore.namePrefix"), environment);
-        final String url = String.format("jdbc:postgresql://%s/%s", hostname, dbName);
-
+        this.conf = conf;
         this.conn = null;
-
-        try {
-            Class.forName("org.postgresql.Driver");
-            if (environment.equals("production")) {
-                logger.info("Production environment, providing credentials for datastore");
-                String[] credentialsParts = conf.getValue("datastore.credentials").split(":");
-                this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url,
-                    credentialsParts[0], credentialsParts[1]));
-            } else {
-                this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url));
-            }
-            logger.info(String.format("Connected to data store at %s", url));
-            // LEGACY The call below was used to syncMigrations. There's now an actor for that (async)
-            // this.syncMigrations();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            logger.info(String.format("Connection to datastore at %s failed", url));
-        } catch (ClassNotFoundException e) {
-            logger.info("org.postgresql.Driver not found");
-        }
     }
 
     public void syncMigrations() {
@@ -66,6 +43,7 @@ public class RepositoryConnector {
             "created_at          TIMESTAMPTZ NOT NULL DEFAULT now()\n" +
         ");");
 
+        this.getConnection();
         try {
             currentStatement = this.conn.createStatement();
             currentStatement.execute(migrationTable);
@@ -180,6 +158,37 @@ public class RepositoryConnector {
                 logger.info(String.format("File already migrated: %s", filename));
             }
         }
+    }
+
+    public Connection getConnection() {
+        final String environment = Environment.currentEnvironment();
+        final String hostname = this.conf.getValue("datastore.hostname");
+        final String dbName = String.format("%s_%s", this.conf.getValue("datastore.namePrefix"), environment);
+        final String url = String.format("jdbc:postgresql://%s/%s", hostname, dbName);
+
+        if (this.conn == null) {
+            try {
+                Class.forName("org.postgresql.Driver");
+                if (environment.equals("production")) {
+                    logger.info("Production environment, providing credentials for datastore");
+                    String[] credentialsParts = this.conf.getValue("datastore.credentials").split(":");
+                    this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url,
+                        credentialsParts[0], credentialsParts[1]));
+                } else {
+                    this.conn = ConnectionLoggingProxy.wrap(DriverManager.getConnection(url));
+                }
+                logger.info(String.format("Connected to data store at %s", url));
+                // LEGACY The call below was used to syncMigrations. There's now an actor for that (async)
+                // this.syncMigrations();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                logger.info(String.format("Connection to datastore at %s failed", url));
+            } catch (ClassNotFoundException e) {
+                logger.info("org.postgresql.Driver not found");
+            }
+        }
+
+        return this.conn;
     }
 
 }
