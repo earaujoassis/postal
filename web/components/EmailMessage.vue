@@ -69,18 +69,18 @@
     @Component
     export default class EmailMessage extends Vue {
         @State("emails") state!: EmailsState;
-        @Action("fetchStatusData", { namespace }) fetchStatusData: any;
-        @Action("fetchEmailData", { namespace }) fetchEmailData: any;
+        @Action("fetchStatus", { namespace }) fetchStatus: any;
+        @Action("fetchEmail", { namespace }) fetchEmail: any;
         @Action("markEmailsAsUnread", { namespace }) markEmailsAsUnread: any;
         @Action("markEmailsAsRead", { namespace }) markEmailsAsRead: any;
 
         mounted() {
-            this.fetchEmailData(this.$route.params.id);
+            this.fetchEmail(this.$route.params.id);
         }
 
         @Watch("$route")
         onRouterChange(to: any, _from: any) {
-            this.fetchEmailData(to.params.id);
+            this.fetchEmail(to.params.id);
         }
 
         @Watch("state", { deep: true })
@@ -89,14 +89,14 @@
                 let { metadata }: any = this.state.currentEmail;
                 if (metadata.read === false) {
                     this.markEmailsAsRead(this.$route.params.id);
-                    this.fetchStatusData();
+                    this.fetchStatus();
                 }
             }
         }
 
         markAsUnread() {
             this.markEmailsAsUnread(this.$route.params.id);
-            this.fetchStatusData();
+            this.fetchStatus();
         }
 
         fixIFrameHeight() {

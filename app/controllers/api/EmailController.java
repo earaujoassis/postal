@@ -30,7 +30,13 @@ public class EmailController extends Controller {
     public Result list(String folder) {
         User user = request().attrs().get(AuthenticationAttrs.USER);
         List<EmailSummary> emails = new ArrayList<EmailSummary>();
-        Iterable<Email> docs = docs = this.emailRepository.getAll(user._id, folder);
+        Iterable<Email> docs;
+
+        if (folder == null) {
+            docs = this.emailRepository.getAll(user._id);
+        } else {
+            docs = this.emailRepository.getAll(user._id, folder);
+        }
 
         for (Email doc : docs) {
             emails.add(new EmailSummary(doc));

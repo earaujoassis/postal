@@ -7,8 +7,8 @@
                     <span>Postal</span>
                 </h1>
                 <ul class="menu">
-                    <li><router-link class="inbox" to="/inbox">Inbox <span class="counter">{{ state.unread }}</span></router-link></li>
-                    <li><router-link class="all-mail" to="/all-mail">All mail</router-link></li>
+                    <li><router-link class="inbox" to="/inbox">Inbox</router-link></li>
+                    <li><router-link class="all-mail" to="/all-mail">All mail <span class="counter">{{ state.unread }}</span></router-link></li>
                     <li><router-link class="sent" to="/sent">Sent</router-link></li>
                     <li><router-link class="drafts" to="/drafts">Drafts</router-link></li>
                     <li><router-link class="trash" to="/trash">Trash</router-link></li>
@@ -36,10 +36,10 @@
     @Component
     export default class App extends Vue {
         @State("emails") state!: EmailsState;
-        @Action("fetchStatusData", { namespace }) fetchStatusData: any;
+        @Action("fetchStatus", { namespace }) fetchStatus: any;
 
         mounted() {
-            this.fetchStatusData();
+            this.fetchStatus();
         }
     }
 </script>

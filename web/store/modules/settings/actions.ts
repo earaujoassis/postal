@@ -4,7 +4,7 @@ import { SettingsState, Settings } from "./types";
 import { RootState } from "@/store/types";
 
 export const actions: ActionTree<SettingsState, RootState> = {
-    fetchSettingsData({ commit }): any {
+    fetchSettings({ commit }): any {
         fetch(`/api/settings`)
             .then(response => response.json())
             .then((settings: Settings) => {
@@ -15,7 +15,7 @@ export const actions: ActionTree<SettingsState, RootState> = {
             });
     },
 
-    updateSettingsData({ commit }, metadata): any {
+    updateSettings({ commit }, metadata): any {
         fetch(`/api/settings`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },

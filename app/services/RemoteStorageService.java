@@ -30,6 +30,10 @@ import repositories.EmailRepository;
 import models.user.User;
 import models.user.UserMetadata;
 import models.email.Email;
+import models.email.EmailFolder;
+import models.email.EmailMetadata;
+import models.providers.RemoteStorage;
+import models.providers.Provider;
 
 public class RemoteStorageService implements IMailer {
 
@@ -51,7 +55,7 @@ public class RemoteStorageService implements IMailer {
             return;
         }
 
-        UserMetadata.RemoteStorage remoteSettings = user.metadata.remoteStorage;
+        RemoteStorage remoteSettings = user.metadata.remoteStorage;
 
         credentials = new BasicAWSCredentials(remoteSettings.accessKey, remoteSettings.secretAccessKey);
         s3Encryption = AmazonS3EncryptionClientBuilder
@@ -81,9 +85,10 @@ public class RemoteStorageService implements IMailer {
                 String rawMessage = s3Encryption.getObjectAsString(remoteSettings.bucketName, messageKey);
                 Session session = Session.getInstance(new Properties());
                 InputStream inputStream = new ByteArrayInputStream(rawMessage.getBytes());
+                EmailMetadata metadata = new EmailMetadata(Provider.REMOTE_STORAGE, EmailFolder.INBOX);
+                Email emailDocument;
                 MimeMessage message;
                 MimeMessageParser enrichedMessage;
-                Email emailDocument;
 
                 try {
                     message = new MimeMessage(session, inputStream);
@@ -101,7 +106,8 @@ public class RemoteStorageService implements IMailer {
                         Email.parseAddressList(enrichedMessage.getCc()),
                         enrichedMessage.getReplyTo(),
                         enrichedMessage.getPlainContent(),
-                        enrichedMessage.getHtmlContent());
+                        enrichedMessage.getHtmlContent(),
+                        metadata);
                     this.emailRepository.insert(emailDocument);
                 } catch (Exception exc) {
                     // Item is not created in the datastore; it can be retrieved another time
