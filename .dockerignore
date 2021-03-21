@@ -12,7 +12,9 @@ tmp/
 /dist/
 .cache
 conf/secrets.sample.conf
+conf/secrets.conf
 conf/config.local.sample.json
+conf/config.local.json
 public/javascripts/build.js
 vscode
 .gradle/
