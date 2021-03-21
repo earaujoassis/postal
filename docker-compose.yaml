@@ -31,7 +31,7 @@ services:
     container_name: postal
     image: postal
     ports:
-      - "8585:9000"
+      - "9000:9000"
     environment:
       POSTAL_SECRET: ovNlZw6S4tf0ryDbJoPKfYhg3MKsJexS
     networks:
