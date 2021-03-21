@@ -29,7 +29,7 @@ public class SyncMigrationsTask {
 
     private void initialize() {
         actorSystem.scheduler().scheduleOnce(
-            Duration.create(5, TimeUnit.SECONDS),
+            Duration.create(100, TimeUnit.MILLISECONDS),
             syncMigrationsActor,
             new Request("sync"),
             executionContext,
