@@ -33,11 +33,11 @@
     })
     export default class Settings extends Vue {
         @State(namespace) state!: SettingsState;
-        @Action("fetchSettingsData", { namespace }) fetchSettingsData: any;
-        @Action("updateSettingsData", { namespace }) updateSettingsData: any;
+        @Action("fetchSettings", { namespace }) fetchSettings: any;
+        @Action("updateSettings", { namespace }) updateSettings: any;
 
         mounted() {
-            this.fetchSettingsData();
+            this.fetchSettings();
         }
 
         onSave(value: RemoteStorage | undefined) {
@@ -45,7 +45,7 @@
                 let settings: ISettings = {
                     remoteStorage: Object.assign(emptyRemoteStorage, value)
                 };
-                this.updateSettingsData(settings);
+                this.updateSettings(settings);
             }
         }
     }

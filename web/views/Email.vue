@@ -32,7 +32,7 @@
 
 <script lang="ts">
     import Component from "vue-class-component";
-    import { Vue } from "vue-property-decorator";
+    import { Vue, Watch } from "vue-property-decorator";
     import { State, Action } from "vuex-class";
 
     import { EmailsState } from "@/store/modules/emails/types";
@@ -42,12 +42,22 @@
     @Component
     export default class Email extends Vue {
         @State(namespace) state!: EmailsState;
-        @Action("fetchStatusData", { namespace }) fetchStatusData: any;
-        @Action("fetchEmailsData", { namespace }) fetchEmailsData: any;
+        @Action("updateCurrentFolder", { namespace }) updateCurrentFolder: any;
+        @Action("fetchStatus", { namespace }) fetchStatus: any;
+        @Action("fetchEmails", { namespace }) fetchEmails: any;
 
         mounted() {
-            this.fetchStatusData();
-            this.fetchEmailsData();
+            this.fetchStatus();
+            let folder = this.$route.params.folder;
+            folder == 'all-mail' ? this.fetchEmails() : this.fetchEmails(folder);
+            this.updateCurrentFolder(folder);
+        }
+
+        @Watch("$route")
+        onRouterChange(to: any, _from: any) {
+            let folder = to.params.folder;
+            folder == 'all-mail' ? this.fetchEmails() : this.fetchEmails(folder);
+            this.updateCurrentFolder(folder);
         }
 
         openEmailView(publicId: string) {
