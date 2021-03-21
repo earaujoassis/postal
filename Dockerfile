@@ -63,5 +63,5 @@ RUN sbt dist && \
 
 EXPOSE 9000
 
-ENTRYPOINT [ "dist/postal-build/bin/postal" ]
+ENTRYPOINT [ "./dist/postal-build/bin/postal" ]
 CMD [ "-Dhttp.port=9000" ]
