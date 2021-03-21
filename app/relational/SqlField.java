@@ -1,4 +1,4 @@
-package models;
+package relational;
 
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.ElementType;
