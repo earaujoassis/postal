@@ -13,9 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.IOException;
 
-import models.SqlField;
+import relational.SqlTable;
+import relational.SqlField;
 import utils.StringUtils;
 
+@SqlTable
 public class Email {
 
     public final static String ENTITY_NAME = "email";
