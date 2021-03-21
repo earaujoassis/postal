@@ -49,14 +49,14 @@
         mounted() {
             this.fetchStatus();
             let folder = this.$route.params.folder;
-            folder == 'all-mail' ? this.fetchEmails() : this.fetchEmails(folder);
+            this.fetchEmails(folder);
             this.updateCurrentFolder(folder);
         }
 
         @Watch("$route")
         onRouterChange(to: any, _from: any) {
             let folder = to.params.folder;
-            folder == 'all-mail' ? this.fetchEmails() : this.fetchEmails(folder);
+            this.fetchEmails(folder);
             this.updateCurrentFolder(folder);
         }
 

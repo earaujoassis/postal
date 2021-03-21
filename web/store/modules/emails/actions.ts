@@ -20,11 +20,12 @@ export const actions: ActionTree<EmailsState, RootState> = {
     },
 
     fetchEmails({ commit }, folder: string): any {
-        fetch(!!folder ? `/api/emails?folder=${folder}` : "/api/emails")
+        let path = folder == 'all-mail' ? "/api/emails" : `/api/emails?folder=${folder}`;
+        fetch(path)
             .then(response => response.json())
-            .then((entries: Array<any>) => {
-                const emails: Array<EmailSummary> = entries.map((entry: any) => new EmailSummary(entry));
-                commit("emailsLoaded", emails);
+            .then(({ emails, total }) => {
+                const summaries: Array<EmailSummary> = emails.map((entry: any) => new EmailSummary(entry));
+                commit("emailsLoaded", { emails: summaries, total });
             }, error => {
                 console.error(error);
                 commit("emailsError");
@@ -107,7 +108,7 @@ export const actions: ActionTree<EmailsState, RootState> = {
         })
         .then(function(response) {
             if (response.status >= 200 && response.status < 300) {
-                commit("emailUnread", publicId);
+                commit("emailMoved", { publicId, folder });
             } else {
                 throw new Error(`server responded with status: ${response.status}`);
             }
