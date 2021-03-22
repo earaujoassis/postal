@@ -1,6 +1,6 @@
-FROM openjdk:13-alpine3.10
+FROM openjdk:13-alpine3.10 AS intermediate
 
-LABEL "com.quatrolabs.postal"="quatroLABS Postal"
+LABEL "com.quatrolabs.postal"="openjdk-sbt"
 LABEL "description"="A security- and privacy-first, mobile-first, and offline-first mail service application"
 
 RUN apk add --update --no-cache \
@@ -47,6 +47,8 @@ RUN update-ca-certificates && \
 ENV PATH=/usr/local/bin:$PATH
 
 RUN java -version && scala -version && scalac -version && sbt sbtVersion
+
+FROM intermediate
 
 ENV NODE_ENV=production
 ENV POSTAL_ENV=production
