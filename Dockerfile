@@ -46,6 +46,8 @@ RUN update-ca-certificates && \
 
 ENV PATH=/usr/local/bin:$PATH
 
+RUN java -version && scala -version && scalac -version && sbt sbtVersion
+
 ENV NODE_ENV=production
 ENV POSTAL_ENV=production
 ENV POSTAL_VERSION=0.1.2
@@ -55,7 +57,6 @@ WORKDIR /app
 COPY . /app
 
 RUN yarn install && yarn build
-RUN java -version && scala -version && scalac -version && sbt sbtVersion
 RUN sbt dist && \
     unzip -d dist target/universal/postal-${POSTAL_VERSION}.zip && \
     mv dist/postal-${POSTAL_VERSION} dist/postal-build && \
