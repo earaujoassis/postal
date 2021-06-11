@@ -1,4 +1,4 @@
-FROM openjdk:13-alpine3.10
+FROM azul/zulu-openjdk-alpine:13.0.1
 
 LABEL "com.quatrolabs.postal"="openjdk-sbt"
 LABEL "description"="A security- and privacy-first, mobile-first, and offline-first mail service application"
