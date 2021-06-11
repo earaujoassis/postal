@@ -14,7 +14,7 @@ the front-end. It also uses a Vault scheme to store application configuration se
 ## Setup & Running
 
 Please make sure to install Java 8+, Gradle, SBT, Node.js (Postal is developed over version
-8.15.0), and Yarn. Also, you must create a `conf/secrets.conf` file according to the template
+14.16.0), and Yarn. Also, you must create a `conf/secrets.conf` file according to the template
 configuration in `conf/secrets.sample.conf` to connect to a Vault k/v secret. The secret
 has the same format as the `conf/config.local.sample.json` file. You may create a
 `conf/config.local.json` if you don't want to use the Vault solution, following the structure
@@ -41,6 +41,14 @@ $ binstubs/deploy.sh
 
 It will create the PostgreSQL container and the Postal container (through `docker-compose`). The
 application should be available at `http://{docker-hostname-or-ip}:8585`.
+
+## Build intermediary image
+
+```sh
+$ docker build --file Dockerfile.openjdk-sbt -t earaujoassis/openjdk-sbt .
+$ docker tag earaujoassis/openjdk-sbt ${PRIVATE_REGISTRY_URL}/openjdk-sbt:latest
+$ docker push ${PRIVATE_REGISTRY_URL}/openjdk-sbt:latest
+```
 
 ## Issues
 
