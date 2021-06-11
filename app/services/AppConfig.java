@@ -2,6 +2,7 @@ package services;
 
 import javax.inject.Singleton;
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
@@ -22,8 +23,19 @@ public class AppConfig {
     @Inject
     public AppConfig(Config conf)
     throws IOException {
-        logger.info("Checking if local configuration exists");
-        File localConfigFile = new File("conf/config.local.json");
+        String fileLocation;
+        File localConfigFile;
+
+        logger.info("Loading local configuration file; checking if it exists");
+        fileLocation = Optional.ofNullable(conf.getString("postal.configuration.file"))
+            .orElseGet(() -> System.getProperty("postal.configuration.file"));
+        logger.info(String.format("Loading local configuration file at: %s", fileLocation));
+
+        if (fileLocation == null) {
+            throw new AppConfigException("Cannot open configuration file: `null`; aborting");
+        }
+
+        localConfigFile = new File(fileLocation);
 
         if (localConfigFile.exists() && !localConfigFile.isDirectory()) {
             logger.info("Local configuration available; attempting to load it");
