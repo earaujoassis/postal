@@ -13,8 +13,7 @@ server.pid
 *.eml
 /dist/
 .cache
-conf/secrets.conf
-conf/config.local.json
+config.local.json
 public/javascripts/build.js
 public/javascripts/build.js.map
 node_modules/
