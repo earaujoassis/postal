@@ -1,9 +1,11 @@
 package services;
 
 import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Comparator;
 import java.util.Properties;
 import javax.mail.internet.MimeMessage;
 import javax.mail.Session;
@@ -74,6 +76,7 @@ public class RemoteStorageService implements IMailer {
                 return obj1.getLastModified().compareTo(obj2.getLastModified());
             }
         });
+        Collections.reverse(Arrays.asList(objectSummaries));
         for (S3ObjectSummary objSummary : objectSummaries) {
             if (batchItemsCounter >= batchSize) {
                 break;
