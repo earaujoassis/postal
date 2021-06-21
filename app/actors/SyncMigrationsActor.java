@@ -9,18 +9,18 @@ import org.slf4j.LoggerFactory;
 
 import actors.SyncMigrationsActorProtocol.Request;
 import services.AppConfig;
-import repositories.RepositoryConnector;
+import repositories.Migrator;
 
 public class SyncMigrationsActor extends AbstractActor {
 
     private final static Logger logger = LoggerFactory.getLogger(SyncMigrationsActor.class);
     private AppConfig conf;
-    private RepositoryConnector repositoryConnector;
+    private Migrator migrator;
 
     @Inject
-    public SyncMigrationsActor(AppConfig conf, RepositoryConnector repositoryConnector) {
+    public SyncMigrationsActor(AppConfig conf, Migrator migrator) {
         this.conf = conf;
-        this.repositoryConnector = repositoryConnector;
+        this.migrator = migrator;
     }
 
     public static Props getProps() {
@@ -42,7 +42,7 @@ public class SyncMigrationsActor extends AbstractActor {
 
     public void syncMigrations() {
         logger.info("Starting the sync migrations task");
-        repositoryConnector.syncMigrations();
+        migrator.syncMigrations();
         logger.info("Finishing the sync migrations task");
     }
 

@@ -19,6 +19,8 @@ libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.61"
 libraryDependencies += "org.apache.logging.log4j" % "log4j" % "2.11.2"
 libraryDependencies += "org.jsoup" % "jsoup" % "1.11.3"
 libraryDependencies += "org.postgresql" % "postgresql" % "42.2.8"
+libraryDependencies += "org.apache.commons" % "commons-pool2" % "2.10.0"
+libraryDependencies += "commons-dbcp" % "commons-dbcp" % "1.4"
 libraryDependencies += "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2"
 libraryDependencies += "com.auth0" % "java-jwt" % "3.10.2"
 
