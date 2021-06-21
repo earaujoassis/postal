@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Connection;
 import org.postgresql.util.PSQLException;
 import org.postgresql.util.PGobject;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -131,10 +132,12 @@ public class QueryBuilder extends QueryBuilderInstropector {
         String sql = String.format("%s %s %s %s",
             this.select, this.from, this.getSafeWhere(), this.getSafeOptionals()).trim();
         List<Map<String, Object>> results = this.emptyList();
+        Connection connection = null;
         PreparedStatement pStmt;
 
         try {
-            pStmt = this.connector.getConnection().prepareStatement(sql);
+            connection = this.connector.getConnectionFromPool();
+            pStmt = connection.prepareStatement(sql);
             int index = 1;
             if (this.arguments != null) {
                 for (Object argument : this.arguments) {
@@ -147,6 +150,8 @@ public class QueryBuilder extends QueryBuilderInstropector {
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
+        } finally {
+            teardownConnection(connection);
         }
 
         return results;
@@ -170,11 +175,13 @@ public class QueryBuilder extends QueryBuilderInstropector {
         String sql = String.format("%s %s %s %s",
             this.select, this.from, this.getSafeWhere(), this.getSafeOptionals()).trim();
         int result = 0;
+        Connection connection = null;
         PreparedStatement pStmt;
         ResultSet resultSet;
 
         try {
-            pStmt = this.connector.getConnection().prepareStatement(sql);
+            connection = this.connector.getConnectionFromPool();
+            pStmt = connection.prepareStatement(sql);
             int index = 1;
             if (this.arguments != null) {
                 for (Object argument : this.arguments) {
@@ -189,6 +196,8 @@ public class QueryBuilder extends QueryBuilderInstropector {
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
+        } finally {
+            teardownConnection(connection);
         }
 
         return result;
@@ -212,10 +221,12 @@ public class QueryBuilder extends QueryBuilderInstropector {
 
         List<Field> fields = this.getSettableFields(this.modelClass);
         int fieldsSize = fields.size();
+        Connection connection = null;
         PreparedStatement pStmt;
 
         try {
-            pStmt = this.connector.getConnection().prepareStatement(this.insert);
+            connection = this.connector.getConnectionFromPool();
+            pStmt = connection.prepareStatement(this.insert);
             for (int i = 1; i < fieldsSize + 1; i++) {
                 Field field = fields.get(i - 1);
                 Object entry = null;
@@ -252,6 +263,8 @@ public class QueryBuilder extends QueryBuilderInstropector {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            teardownConnection(connection);
         }
     }
 
@@ -281,10 +294,12 @@ public class QueryBuilder extends QueryBuilderInstropector {
 
         String sql = String.format("%s %s %s %s",
             this.update, this.setters, this.getSafeWhere(), this.getSafeOptionals()).trim();
+        Connection connection = null;
         PreparedStatement pStmt;
 
         try {
-            pStmt = this.connector.getConnection().prepareStatement(sql);
+            connection = this.connector.getConnectionFromPool();
+            pStmt = connection.prepareStatement(sql);
             int index = 1;
             for (Object argument : arguments) {
                 try {
@@ -316,6 +331,8 @@ public class QueryBuilder extends QueryBuilderInstropector {
         } catch (NullPointerException e) {
             e.printStackTrace();
             throw new QueryBuilderException("No arguments; cannot UPDATE");
+        } finally {
+            teardownConnection(connection);
         }
     }
 
@@ -341,6 +358,16 @@ public class QueryBuilder extends QueryBuilderInstropector {
         }
 
         this.arguments.add(argument);
+    }
+
+    private void teardownConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
