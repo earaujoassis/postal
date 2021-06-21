@@ -73,10 +73,9 @@ public class RemoteStorageService implements IMailer {
             @Override
             public int compare(S3ObjectSummary obj1, S3ObjectSummary obj2) {
                 // descending ordering
-                return obj1.getLastModified().compareTo(obj2.getLastModified());
+                return obj2.getLastModified().compareTo(obj1.getLastModified());
             }
         });
-        Collections.reverse(Arrays.asList(objectSummaries));
         for (S3ObjectSummary objSummary : objectSummaries) {
             if (batchItemsCounter >= batchSize) {
                 break;
