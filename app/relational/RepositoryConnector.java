@@ -1,31 +1,19 @@
-package repositories;
+package relational;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Map;
-import java.util.Arrays;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.jdbcdslog.ConnectionLoggingProxy;
 import org.postgresql.util.PSQLException;
-import org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS;
-import org.apache.commons.dbcp.datasources.SharedPoolDataSource;
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 import utils.Environment;
 import services.AppConfig;
-import relational.AbstractConnectionHandler;
 
 @Singleton
 public class RepositoryConnector extends AbstractConnectionHandler {
@@ -46,35 +34,36 @@ public class RepositoryConnector extends AbstractConnectionHandler {
     }
 
     private void setupPool() {
-        DriverAdapterCPDS cpds = new DriverAdapterCPDS();
+        PoolProperties properties = new PoolProperties();
 
         final String environment = Environment.currentEnvironment();
         final String hostname = this.conf.getValue("datastore.hostname");
         final String dbName = String.format("%s_%s", this.conf.getValue("datastore.namePrefix"), environment);
         final String url = String.format("jdbc:postgresql://%s/%s", hostname, dbName);
 
-        try {
-            cpds.setDriver("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            logger.info("org.postgresql.Driver not found");
-            e.printStackTrace();
-        }
-
-        cpds.setUrl(url);
+        properties.setDriverClassName("org.postgresql.Driver");
+        properties.setUrl(url);
+        properties.setMaxActive(100);
+        properties.setMaxIdle(10);
+        properties.setMaxWait(10000);
+        properties.setRemoveAbandoned(true);
+        properties.setRemoveAbandonedTimeout(60);
+        properties.setMinEvictableIdleTimeMillis(5000);
+        properties.setTimeBetweenEvictionRunsMillis(30000);
+        properties.setJdbcInterceptors(
+            "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;" +
+            "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"
+        );
 
         if (environment.equals("production")) {
             String[] credentialsParts = this.conf.getValue("datastore.credentials").split(":");
-            cpds.setUser(credentialsParts[0]);
-            cpds.setPassword(credentialsParts[1]);
+            properties.setUsername(credentialsParts[0]);
+            properties.setPassword(credentialsParts[1]);
         }
 
-        SharedPoolDataSource pool = new SharedPoolDataSource();
-        pool.setConnectionPoolDataSource(cpds);
-        pool.setMaxActive(10);
-        pool.setMaxIdle(10);
-        pool.setMaxWait(50);
-
-        dataSource = pool;
+        DataSource pool = new DataSource();
+        pool.setPoolProperties(properties);
+        this.dataSource = pool;
     }
 
     public Connection getConnectionFromPool()

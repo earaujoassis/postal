@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import models.email.Email;
 import models.email.EmailMetadata;
 import relational.QueryBuilder;
+import relational.RepositoryConnector;
 
 @Singleton
 public class EmailRepository extends AbstractEntityRepository {

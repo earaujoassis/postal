@@ -15,8 +15,6 @@ import org.postgresql.util.PGobject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import repositories.RepositoryConnector;
-
 public class QueryBuilder extends QueryBuilderInstropector {
 
     private enum Mode {
@@ -133,7 +131,7 @@ public class QueryBuilder extends QueryBuilderInstropector {
             this.select, this.from, this.getSafeWhere(), this.getSafeOptionals()).trim();
         List<Map<String, Object>> results = this.emptyList();
         Connection connection = null;
-        PreparedStatement pStmt;
+        PreparedStatement pStmt = null;
 
         try {
             connection = this.connector.getConnectionFromPool();
@@ -145,12 +143,12 @@ public class QueryBuilder extends QueryBuilderInstropector {
                 }
             }
             results = this.fromResultSetToListOfHashes(pStmt.executeQuery(), modelClass);
-            pStmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {
+            teardownStatement(pStmt);
             teardownConnection(connection);
         }
 
@@ -176,7 +174,7 @@ public class QueryBuilder extends QueryBuilderInstropector {
             this.select, this.from, this.getSafeWhere(), this.getSafeOptionals()).trim();
         int result = 0;
         Connection connection = null;
-        PreparedStatement pStmt;
+        PreparedStatement pStmt = null;
         ResultSet resultSet;
 
         try {
@@ -191,12 +189,12 @@ public class QueryBuilder extends QueryBuilderInstropector {
             resultSet = pStmt.executeQuery();
             resultSet.next();
             result = resultSet.getInt(1);
-            pStmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {
+            teardownStatement(pStmt);
             teardownConnection(connection);
         }
 
@@ -221,8 +219,9 @@ public class QueryBuilder extends QueryBuilderInstropector {
 
         List<Field> fields = this.getSettableFields(this.modelClass);
         int fieldsSize = fields.size();
+        boolean result = false;
         Connection connection = null;
-        PreparedStatement pStmt;
+        PreparedStatement pStmt = null;
 
         try {
             connection = this.connector.getConnectionFromPool();
@@ -258,14 +257,16 @@ public class QueryBuilder extends QueryBuilderInstropector {
                 }
             }
             pStmt.execute();
-            pStmt.close();
-            return true;
+            result = true;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            result = false;
         } finally {
+            teardownStatement(pStmt);
             teardownConnection(connection);
         }
+
+        return result;
     }
 
     public QueryBuilder update() {
@@ -294,8 +295,9 @@ public class QueryBuilder extends QueryBuilderInstropector {
 
         String sql = String.format("%s %s %s %s",
             this.update, this.setters, this.getSafeWhere(), this.getSafeOptionals()).trim();
+        boolean result = false;
         Connection connection = null;
-        PreparedStatement pStmt;
+        PreparedStatement pStmt = null;
 
         try {
             connection = this.connector.getConnectionFromPool();
@@ -323,17 +325,19 @@ public class QueryBuilder extends QueryBuilderInstropector {
                 index++;
             }
             pStmt.execute();
-            pStmt.close();
-            return true;
+            result = true;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            result = false;
         } catch (NullPointerException e) {
             e.printStackTrace();
             throw new QueryBuilderException("No arguments; cannot UPDATE");
         } finally {
+            teardownStatement(pStmt);
             teardownConnection(connection);
         }
+
+        return result;
     }
 
     private String getSafeWhere() {
