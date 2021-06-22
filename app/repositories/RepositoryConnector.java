@@ -25,9 +25,10 @@ import org.apache.commons.dbcp.datasources.SharedPoolDataSource;
 
 import utils.Environment;
 import services.AppConfig;
+import relational.AbstractConnectionHandler;
 
 @Singleton
-public class RepositoryConnector {
+public class RepositoryConnector extends AbstractConnectionHandler {
 
     private final static int TIMEOUT_IN_SECONDS = 5;
 
@@ -87,6 +88,17 @@ public class RepositoryConnector {
         }
     }
 
+    public boolean isPoolHealthy() {
+        try {
+            Connection connection = this.getConnectionFromPool();
+            return connection.isValid(TIMEOUT_IN_SECONDS);
+        } catch (SQLException e) {
+            return false;
+        } finally {
+            teardownConnection(connection);
+        }
+    }
+
     @Deprecated
     public Connection getConnection() {
         final String environment = Environment.currentEnvironment();
@@ -120,6 +132,7 @@ public class RepositoryConnector {
         return this.connection;
     }
 
+    @Deprecated
     public boolean isHealthy() {
         if (this.connection == null) {
             return false;
@@ -134,6 +147,7 @@ public class RepositoryConnector {
         }
     }
 
+    @Deprecated
     public boolean isUnhealthy() {
         return !this.isHealthy();
     }
