@@ -12,7 +12,7 @@ import java.lang.reflect.Modifier;
 import relational.SqlTable;
 import relational.SqlField;
 
-public abstract class QueryBuilderInstropector {
+public abstract class QueryBuilderInstropector extends AbstractConnectionHandler {
 
     protected String questionMarksForFields(int size) {
         List<String> questionMarks = new ArrayList<>();
