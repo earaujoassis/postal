@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import actors.SyncMigrationsActorProtocol.Request;
 import services.AppConfig;
-import repositories.Migrator;
+import relational.Migrator;
 
 public class SyncMigrationsActor extends AbstractActor {
 

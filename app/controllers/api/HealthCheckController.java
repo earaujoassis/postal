@@ -4,7 +4,7 @@ import javax.inject.Inject;
 import play.mvc.*;
 
 import actions.Authentication;
-import repositories.RepositoryConnector;
+import relational.RepositoryConnector;
 
 @Authentication(enforce = false)
 public class HealthCheckController extends Controller {

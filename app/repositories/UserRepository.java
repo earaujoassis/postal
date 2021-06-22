@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import models.user.User;
 import models.user.UserMetadata;
 import relational.QueryBuilder;
+import relational.RepositoryConnector;
 
 @Singleton
 public class UserRepository extends AbstractEntityRepository {
