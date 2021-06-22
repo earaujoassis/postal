@@ -5,6 +5,7 @@
 .gradle
 .settings
 .project
+.cache
 bin
 dist
 lib
@@ -14,9 +15,9 @@ node_modules
 project/project
 project/target
 public/javascripts/build.js
+public/javascripts/build.js.map
 serverless
 target
-.cache
 cacerts
 config.local.sample.json
 config.local.json
