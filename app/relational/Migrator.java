@@ -1,4 +1,4 @@
-package repositories;
+package relational;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,10 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import models.user.UserSession;
-import relational.QueryBuilder;
 
 @Singleton
-public class Migrator extends AbstractEntityRepository {
+public class Migrator {
 
     private final static Logger logger = LoggerFactory.getLogger(Migrator.class);
 

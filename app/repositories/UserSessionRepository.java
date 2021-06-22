@@ -7,6 +7,7 @@ import java.util.Map;
 
 import models.user.UserSession;
 import relational.QueryBuilder;
+import relational.RepositoryConnector;
 
 @Singleton
 public class UserSessionRepository extends AbstractEntityRepository {
