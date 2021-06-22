@@ -12,10 +12,10 @@ public class HealthCheckController extends Controller {
     @Inject RepositoryConnector repositoryConnector;
 
     public Result status() {
-        if (repositoryConnector.isHealthy()) {
+        if (repositoryConnector.isPoolHealthy()) {
             return ok("healthy");
         } else {
-            return internalServerError("unhealthy");
+            return status(503, "unhealthy");
         }
     }
 

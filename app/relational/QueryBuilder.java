@@ -360,14 +360,4 @@ public class QueryBuilder extends QueryBuilderInstropector {
         this.arguments.add(argument);
     }
 
-    private void teardownConnection(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 }
